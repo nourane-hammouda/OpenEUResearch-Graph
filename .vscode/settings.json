@@ -1,0 +1,7 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/env/bin/python",
+  "python.terminal.activateEnvironment": true,
+  "files.eol": "\n",
+  "editor.formatOnSave": true,
+  "liveServer.settings.port": 5503
+}

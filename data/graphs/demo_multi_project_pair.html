@@ -1,0 +1,1614 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Démo collaboration multi-projets</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/vis-network@9.1.9/styles/vis-network.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, Arial, sans-serif; margin: 0; color: #0f172a; background:#f1f5f9; }
+    .hero {
+      background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #db2777 100%);
+      color: #fff; padding: 36px 28px 28px; box-shadow: 0 8px 30px rgba(15,23,42,.15);
+    }
+    .hero h1 { margin:0; font-size: 28px; font-weight: 800; letter-spacing:-.4px }
+    .hero .sub { margin-top: 6px; opacity: .85; font-size: 14px }
+    .hero .actor-row { display:flex; gap: 16px; margin-top: 22px; flex-wrap:wrap }
+    .hero .actor { flex: 1 1 340px; background: rgba(255,255,255,.10); backdrop-filter: blur(8px);
+      border:1px solid rgba(255,255,255,.18); border-radius: 14px; padding: 14px 18px; }
+    .hero .actor .lbl { text-transform: uppercase; font-size: 11px; opacity:.7; letter-spacing:.6px }
+    .hero .actor .name { font-size: 17px; font-weight: 700; margin-top:4px }
+    .hero .actor .meta { font-size: 12px; opacity:.85; margin-top: 4px }
+    .container { max-width: 1280px; margin: -18px auto 36px; padding: 0 24px; }
+    .kpis { display:grid; grid-template-columns: repeat(4, 1fr); gap:14px; margin-bottom: 18px; }
+    .kpi { background:#fff; border:1px solid #e2e8f0; border-radius: 14px; padding: 14px 16px;
+      box-shadow: 0 4px 16px rgba(15,23,42,.06); position: relative; overflow:hidden }
+    .kpi::after { content: ""; position: absolute; right:-30px; top:-30px; width: 80px; height: 80px;
+      border-radius: 50%; opacity:.12 }
+    .kpi.k1::after { background:#7c3aed } .kpi.k2::after { background:#db2777 }
+    .kpi.k3::after { background:#0ea5e9 } .kpi.k4::after { background:#16a34a }
+    .kpi .icon { font-size: 22px; }
+    .kpi .lbl { font-size: 11px; color:#64748b; text-transform: uppercase; letter-spacing:.6px; margin-top:6px }
+    .kpi .val { font-size: 22px; font-weight: 800; color:#0f172a; margin-top: 3px }
+    .grid { display:grid; grid-template-columns: 2fr 1fr; gap:14px; margin-bottom: 18px }
+    .card { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:16px; box-shadow:0 4px 16px rgba(15,23,42,.06) }
+    .card h2 { margin: 0 0 12px; font-size: 15px; color:#1e293b; letter-spacing:.2px }
+    .card .desc { font-size: 12px; color:#64748b; margin-bottom: 10px }
+    #network { width: 100%; height: 540px; border-radius: 10px; background:
+      radial-gradient(circle at 50% 50%, #f8fafc 0%, #e2e8f0 100%); }
+    .charts { display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom: 18px }
+    .table-card { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:16px; box-shadow:0 4px 16px rgba(15,23,42,.06) }
+    .table-toolbar { display:flex; gap:10px; align-items:center; margin-bottom: 12px; flex-wrap:wrap }
+    .search { flex:1; padding:10px 14px; border:1px solid #cbd5e1; border-radius:10px; font-size:13px; outline:none; min-width: 220px }
+    .search:focus { border-color:#7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,.18) }
+    .pill { padding: 6px 12px; border-radius: 999px; background:#f1f5f9; color:#475569; font-size:12px; font-weight:600 }
+    table { width:100%; border-collapse: collapse; font-size: 13px }
+    thead th { background:#f8fafc; color:#0f172a; text-align:left; padding:10px 12px; cursor:pointer; user-select:none;
+      font-weight: 600; border-bottom: 1px solid #e2e8f0; position: sticky; top:0 }
+    thead th:hover { background:#eef2ff }
+    thead th::after { content: " ↕"; opacity:.4; font-size:10px }
+    thead th.sort-asc::after { content: " ▲"; opacity:.9 }
+    thead th.sort-desc::after { content: " ▼"; opacity:.9 }
+    tbody td { padding: 10px 12px; border-bottom: 1px dashed #e2e8f0 }
+    tbody tr:hover { background: #fafbff }
+    .chip { display:inline-block; padding: 3px 8px; border-radius:6px; font-size:11px; font-weight:600 }
+    .chip-topic { background: #f1f5f9; color:#1e293b }
+    .chip-prog { background: #ede9fe; color:#5b21b6 }
+    .legend { display:flex; gap: 16px; align-items:center; margin: 6px 0 14px; font-size:12px; color:#475569 }
+    .legend .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; vertical-align:middle }
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr }
+      .charts { grid-template-columns: 1fr }
+      .kpis { grid-template-columns: repeat(2, 1fr) }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <h1>Démo : collaboration multi-projets entre deux organisations</h1>
+    <div class="sub">Vue détaillée des projets communs et de leur financement · 196 projets partagés</div>
+    <div class="actor-row">
+      <div class="actor">
+        <div class="lbl">Organisation A</div>
+        <div class="name">CENTRE NATIONAL DE LA RECHERCHE SCIENTIFIQUE CNRS</div>
+        <div class="meta">FR · PARIS · Budget global 1,190.7 M€ · 1868 projets</div>
+      </div>
+      <div class="actor">
+        <div class="lbl">Organisation B</div>
+        <div class="name">COMMISSARIAT A L ENERGIE ATOMIQUE ET AUX ENERGIES ALTERNATIVES</div>
+        <div class="meta">FR · Paris · Budget global 707.8 M€ · 780 projets</div>
+      </div>
+    </div>
+  </header>
+  <main class="container">
+    <section class="kpis">
+      <div class="kpi k1"><div class="icon">🔗</div><div class="lbl">Projets communs</div><div class="val">196</div></div>
+      <div class="kpi k2"><div class="icon">💶</div><div class="lbl">Financement total A+B</div><div class="val">382.9 M€</div></div>
+      <div class="kpi k3"><div class="icon">📊</div><div class="lbl">Moyenne par projet</div><div class="val">1,953 k€</div></div>
+      <div class="kpi k4"><div class="icon">⚖️</div><div class="lbl">Part A / B</div><div class="val">33% / 67%</div></div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>🕸️ Graphe bipartite interactif A ↔ projets ↔ B</h2>
+        <div class="desc">Survolez les nœuds pour le détail · cliquez et glissez pour explorer · molette pour zoomer.</div>
+        <div class="legend">
+          <span><span class="dot" style="background:#2563eb"></span>Organisation A</span>
+          <span><span class="dot" style="background:#a78bfa"></span>Projet commun (taille = budget)</span>
+          <span><span class="dot" style="background:#dc2626"></span>Organisation B</span>
+        </div>
+        <div id="network"></div>
+      </div>
+      <div class="card">
+        <h2>🎯 Programmes</h2>
+        <div class="desc">Répartition des projets communs par programme cadre.</div>
+        <canvas id="chartProgram" height="220"></canvas>
+      </div>
+    </section>
+
+    <section class="charts">
+      <div class="card">
+        <h2>📚 Top 10 des sujets</h2>
+        <div class="desc">Sujets/topics les plus représentés dans les projets communs.</div>
+        <canvas id="chartTopic" height="240"></canvas>
+      </div>
+      <div class="card">
+        <h2>💸 Comparaison des financements (top 10)</h2>
+        <div class="desc">Financement reçu par A et B sur chaque projet commun phare.</div>
+        <canvas id="chartFunding" height="240"></canvas>
+      </div>
+    </section>
+
+    <section class="table-card">
+      <div class="table-toolbar">
+        <h2 style="margin:0">📋 Détail des projets communs</h2>
+        <span class="pill" id="projectCount">196 projets</span>
+        <input class="search" id="searchInput" placeholder="🔎 Filtrer par titre, sujet ou programme..."/>
+      </div>
+      <div style="max-height:520px; overflow:auto; border:1px solid #e2e8f0; border-radius:10px">
+        <table id="projectTable">
+          <thead><tr>
+            <th data-key="title">Projet</th>
+            <th data-key="topic">Sujet</th>
+            <th data-key="program">Programme</th>
+            <th data-key="num" data-numeric="1">Financement A (€)</th>
+            <th data-key="num" data-numeric="1">Financement B (€)</th>
+            <th data-key="num" data-numeric="1" class="sort-desc">Total A+B (€)</th>
+          </tr></thead>
+          <tbody><tr data-search="implementation of activities described in the roadmap to fusion during horizon 2020 through a joint programme of the members of the eurofusion consortium euratom h2020_projects_trimmed">
+          <td>Implementation of activities described in the Roadmap to Fusion during Horizon 2020 through a Joint programme of the members of the EUROfusion consortium</td>
+          <td><span class="chip chip-topic">EURATOM</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="70929420.51" style="text-align:right">70,929,421</td>
+          <td data-num="70929420.51" style="text-align:right;font-weight:700;color:#7c3aed">70,929,421</td>
+        </tr><tr data-search="which architecture yields two other generations of fully depleted advanced substrate and technologies ecsel-02-2014 h2020_projects_trimmed">
+          <td>Which Architecture Yields Two Other Generations Of Fully depleted Advanced Substrate and Technologies</td>
+          <td><span class="chip chip-topic">ECSEL-02-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="594996.0" style="text-align:right">594,996</td>
+          <td data-num="13831513.75" style="text-align:right">13,831,514</td>
+          <td data-num="14426509.75" style="text-align:right;font-weight:700;color:#7c3aed">14,426,510</td>
+        </tr><tr data-search="3d integration technology for silicon spin qubits erc-2018-syg h2020_projects_trimmed">
+          <td>3D integration technology for silicon spin qubits</td>
+          <td><span class="chip chip-topic">ERC-2018-SyG</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="3010143.75" style="text-align:right">3,010,144</td>
+          <td data-num="10980316.25" style="text-align:right">10,980,316</td>
+          <td data-num="13990460.0" style="text-align:right;font-weight:700;color:#7c3aed">13,990,460</td>
+        </tr><tr data-search="wafers for automotive and other key applications using memories, embedded in ulsi processors ecsel-2017-1 h2020_projects_trimmed">
+          <td>Wafers for Automotive and other Key applications using Memories, embedded in Ulsi Processors</td>
+          <td><span class="chip chip-topic">ECSEL-2017-1</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="654874.5" style="text-align:right">654,874</td>
+          <td data-num="9268018.81" style="text-align:right">9,268,019</td>
+          <td data-num="9922893.31" style="text-align:right;font-weight:700;color:#7c3aed">9,922,893</td>
+        </tr><tr data-search="human brain project specific grant agreement 3 sga-fetflag-hbp-2019 h2020_projects_trimmed">
+          <td>Human Brain Project Specific Grant Agreement 3</td>
+          <td><span class="chip chip-topic">SGA-FETFLAG-HBP-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="6013460.78" style="text-align:right">6,013,461</td>
+          <td data-num="3538462.08" style="text-align:right">3,538,462</td>
+          <td data-num="9551922.86" style="text-align:right;font-weight:700;color:#7c3aed">9,551,923</td>
+        </tr><tr data-search="atmospheric water cycle over antarctica: past, present and future erc-2020-syg h2020_projects_trimmed">
+          <td>Atmospheric WAter Cycle over Antarctica: Past, Present and Future</td>
+          <td><span class="chip chip-topic">ERC-2020-SyG</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="5570555.0" style="text-align:right">5,570,555</td>
+          <td data-num="2968617.5" style="text-align:right">2,968,618</td>
+          <td data-num="8539172.5" style="text-align:right;font-weight:700;color:#7c3aed">8,539,172</td>
+        </tr><tr data-search="energy for smart objects ecsel-18-2015 h2020_projects_trimmed">
+          <td>Energy for Smart Objects</td>
+          <td><span class="chip chip-topic">ECSEL-18-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="7638913.4" style="text-align:right">7,638,913</td>
+          <td data-num="7638913.4" style="text-align:right;font-weight:700;color:#7c3aed">7,638,913</td>
+        </tr><tr data-search="energy for smart objects ecsel-18-2015 h2020_projects_trimmed">
+          <td>Energy for Smart Objects</td>
+          <td><span class="chip chip-topic">ECSEL-18-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="7638913.4" style="text-align:right">7,638,913</td>
+          <td data-num="7638913.4" style="text-align:right;font-weight:700;color:#7c3aed">7,638,913</td>
+        </tr><tr data-search="graphene flagship core project 3 sga-fet-graphene-2019 h2020_projects_trimmed">
+          <td>Graphene Flagship Core Project 3</td>
+          <td><span class="chip chip-topic">SGA-FET-GRAPHENE-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="4431573.0" style="text-align:right">4,431,573</td>
+          <td data-num="2118208.25" style="text-align:right">2,118,208</td>
+          <td data-num="6549781.25" style="text-align:right;font-weight:700;color:#7c3aed">6,549,781</td>
+        </tr><tr data-search="graphene-based disruptive technologies fetflagship h2020_projects_trimmed">
+          <td>Graphene-based disruptive technologies</td>
+          <td><span class="chip chip-topic">FETFLAGSHIP</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="3902401.7" style="text-align:right">3,902,402</td>
+          <td data-num="2083913.09" style="text-align:right">2,083,913</td>
+          <td data-num="5986314.79" style="text-align:right;font-weight:700;color:#7c3aed">5,986,315</td>
+        </tr><tr data-search="interactive computing e-infrastructure for the human brain project sga-infra-fetflag-hbp h2020_projects_trimmed">
+          <td>Interactive Computing E-Infrastructure for the Human Brain Project</td>
+          <td><span class="chip chip-topic">SGA-INFRA-FETFLAG-HBP</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="5316679.6" style="text-align:right">5,316,680</td>
+          <td data-num="5316679.6" style="text-align:right;font-weight:700;color:#7c3aed">5,316,680</td>
+        </tr><tr data-search="human brain project specific grant agreement 2 sga-fetflag-hbp-2017 h2020_projects_trimmed">
+          <td>Human Brain Project Specific Grant Agreement 2</td>
+          <td><span class="chip chip-topic">SGA-FETFLAG-HBP-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="3543056.78" style="text-align:right">3,543,057</td>
+          <td data-num="1699791.08" style="text-align:right">1,699,791</td>
+          <td data-num="5242847.859999999" style="text-align:right;font-weight:700;color:#7c3aed">5,242,848</td>
+        </tr><tr data-search="graphene flagship core project 2 sga-fet-graphene-2017 h2020_projects_trimmed">
+          <td>Graphene Flagship Core Project 2</td>
+          <td><span class="chip chip-topic">SGA-FET-GRAPHENE-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="3192568.5" style="text-align:right">3,192,568</td>
+          <td data-num="1920991.75" style="text-align:right">1,920,992</td>
+          <td data-num="5113560.25" style="text-align:right;font-weight:700;color:#7c3aed">5,113,560</td>
+        </tr><tr data-search="human brain project specific grant agreement 1 fetflagship h2020_projects_trimmed">
+          <td>Human Brain Project Specific Grant Agreement 1</td>
+          <td><span class="chip chip-topic">FETFLAGSHIP</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="3353473.75" style="text-align:right">3,353,474</td>
+          <td data-num="1697128.0" style="text-align:right">1,697,128</td>
+          <td data-num="5050601.75" style="text-align:right;font-weight:700;color:#7c3aed">5,050,602</td>
+        </tr><tr data-search="european joint programme on radioactive waste management nfrp-2018-6 h2020_projects_trimmed">
+          <td>European Joint Programme on Radioactive Waste Management</td>
+          <td><span class="chip chip-topic">NFRP-2018-6</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="3075696.18" style="text-align:right">3,075,696</td>
+          <td data-num="1474834.71" style="text-align:right">1,474,835</td>
+          <td data-num="4550530.890000001" style="text-align:right;font-weight:700;color:#7c3aed">4,550,531</td>
+        </tr><tr data-search="quantum large scale integretion in silicon fetflag-05-2020 h2020_projects_trimmed">
+          <td>Quantum Large Scale Integretion in Silicon</td>
+          <td><span class="chip chip-topic">FETFLAG-05-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1304260.0" style="text-align:right">1,304,260</td>
+          <td data-num="3198700.0" style="text-align:right">3,198,700</td>
+          <td data-num="4502960.0" style="text-align:right;font-weight:700;color:#7c3aed">4,502,960</td>
+        </tr><tr data-search="astronomy esfri and research infrastructure cluster infradev-4-2014-2015 h2020_projects_trimmed">
+          <td>Astronomy ESFRI and Research Infrastructure Cluster</td>
+          <td><span class="chip chip-topic">INFRADEV-4-2014-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="3936450.0" style="text-align:right">3,936,450</td>
+          <td data-num="251250.0" style="text-align:right">251,250</td>
+          <td data-num="4187700.0" style="text-align:right;font-weight:700;color:#7c3aed">4,187,700</td>
+        </tr><tr data-search="understanding our galactic ecosystem: from the disk of the milky way to the formation sites of stars and planets erc-2019-syg h2020_projects_trimmed">
+          <td>Understanding our Galactic ecosystem: From the disk of the Milky Way to the formation sites of stars and planets</td>
+          <td><span class="chip chip-topic">ERC-2019-SyG</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="362500.0" style="text-align:right">362,500</td>
+          <td data-num="3420137.5" style="text-align:right">3,420,138</td>
+          <td data-num="3782637.5" style="text-align:right;font-weight:700;color:#7c3aed">3,782,638</td>
+        </tr><tr data-search="thermal vision augmented awareness ecsel-2018-2-ria h2020_projects_trimmed">
+          <td>tHErmaL vIsion AUgmented awarenesS</td>
+          <td><span class="chip chip-topic">ECSEL-2018-2-RIA</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="305288.38" style="text-align:right">305,288</td>
+          <td data-num="3182833.06" style="text-align:right">3,182,833</td>
+          <td data-num="3488121.44" style="text-align:right;font-weight:700;color:#7c3aed">3,488,121</td>
+        </tr><tr data-search="solutions for sustainable access to atmospheric research facilities infraia-03-2020 h2020_projects_trimmed">
+          <td>Solutions for Sustainable Access to Atmospheric Research Facilities</td>
+          <td><span class="chip chip-topic">INFRAIA-03-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="3487518.75" style="text-align:right">3,487,519</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="3487518.75" style="text-align:right;font-weight:700;color:#7c3aed">3,487,519</td>
+        </tr><tr data-search="cyber physical systems for europe ecsel-2018-1-ia h2020_projects_trimmed">
+          <td>Cyber Physical Systems for Europe</td>
+          <td><span class="chip chip-topic">ECSEL-2018-1-IA</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="91223.74" style="text-align:right">91,224</td>
+          <td data-num="3388525.89" style="text-align:right">3,388,526</td>
+          <td data-num="3479749.6300000004" style="text-align:right;font-weight:700;color:#7c3aed">3,479,750</td>
+        </tr><tr data-search="european exascale processor  memory node design fethpc-1-2014 h2020_projects_trimmed">
+          <td>European Exascale Processor  Memory Node Design</td>
+          <td><span class="chip chip-topic">FETHPC-1-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="369165.0" style="text-align:right">369,165</td>
+          <td data-num="3041945.0" style="text-align:right">3,041,945</td>
+          <td data-num="3411110.0" style="text-align:right;font-weight:700;color:#7c3aed">3,411,110</td>
+        </tr><tr data-search="na-ion battery demonstration for electric storage lce-10-2014 h2020_projects_trimmed">
+          <td>Na-Ion bAttery Demonstration for Electric Storage</td>
+          <td><span class="chip chip-topic">LCE-10-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="946900.61" style="text-align:right">946,901</td>
+          <td data-num="1568349.75" style="text-align:right">1,568,350</td>
+          <td data-num="2515250.36" style="text-align:right;font-weight:700;color:#7c3aed">2,515,250</td>
+        </tr><tr data-search="cmos/magnetoelectronic integrated circuits wil multifunctional capabilities erc-adg-2014 h2020_projects_trimmed">
+          <td>CMOS/magnetoelectronic Integrated Circuits wil Multifunctional Capabilities</td>
+          <td><span class="chip chip-topic">ERC-ADG-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="2500000.0" style="text-align:right">2,500,000</td>
+          <td data-num="2500000.0" style="text-align:right;font-weight:700;color:#7c3aed">2,500,000</td>
+        </tr><tr data-search="nan nan nan">
+          <td>nan</td>
+          <td><span class="chip chip-topic">nan</span></td>
+          <td><span class="chip chip-prog">nan</span></td>
+          <td data-num="2000484.5" style="text-align:right">2,000,484</td>
+          <td data-num="494625.0" style="text-align:right">494,625</td>
+          <td data-num="2495109.5" style="text-align:right;font-weight:700;color:#7c3aed">2,495,110</td>
+        </tr><tr data-search="the integrated initiative of european laser research infrastructures infraia-1-2014-2015 h2020_projects_trimmed">
+          <td>The Integrated Initiative of European Laser Research Infrastructures</td>
+          <td><span class="chip chip-topic">INFRAIA-1-2014-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1799515.0" style="text-align:right">1,799,515</td>
+          <td data-num="610244.0" style="text-align:right">610,244</td>
+          <td data-num="2409759.0" style="text-align:right;font-weight:700;color:#7c3aed">2,409,759</td>
+        </tr><tr data-search="adaptive actin architectures erc-2016-adg h2020_projects_trimmed">
+          <td>Adaptive Actin Architectures</td>
+          <td><span class="chip chip-topic">ERC-2016-ADG</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1175902.5" style="text-align:right">1,175,902</td>
+          <td data-num="1173995.5" style="text-align:right">1,173,996</td>
+          <td data-num="2349898.0" style="text-align:right;font-weight:700;color:#7c3aed">2,349,898</td>
+        </tr><tr data-search="ground-breaking perovskite technologies for advanced x-ray medical imaging systems ict-05-2019 h2020_projects_trimmed">
+          <td>ground-breaking PEROvskite technologies for advanced X-ray medical Imaging Systems</td>
+          <td><span class="chip chip-topic">ICT-05-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="623750.0" style="text-align:right">623,750</td>
+          <td data-num="1706156.25" style="text-align:right">1,706,156</td>
+          <td data-num="2329906.25" style="text-align:right;font-weight:700;color:#7c3aed">2,329,906</td>
+        </tr><tr data-search="na ion materials as essential components to manufacture robust battery cells for non-automotive applications lc-bat-2-2019 h2020_projects_trimmed">
+          <td>NA ION MATERIALS AS ESSENTIAL COMPONENTS TO MANUFACTURE ROBUST BATTERY CELLS FOR NON-AUTOMOTIVE APPLICATIONS</td>
+          <td><span class="chip chip-topic">LC-BAT-2-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1184959.78" style="text-align:right">1,184,960</td>
+          <td data-num="1081072.5" style="text-align:right">1,081,072</td>
+          <td data-num="2266032.2800000003" style="text-align:right;font-weight:700;color:#7c3aed">2,266,032</td>
+        </tr><tr data-search="controlling and measuring relativistic motion of matter with ultraintense structured light erc-adg-2015 h2020_projects_trimmed">
+          <td>CONTROLLING AND MEASURING RELATIVISTIC MOTION OF MATTER WITH ULTRAINTENSE STRUCTURED LIGHT</td>
+          <td><span class="chip chip-topic">ERC-ADG-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="250000.0" style="text-align:right">250,000</td>
+          <td data-num="2000000.0" style="text-align:right">2,000,000</td>
+          <td data-num="2250000.0" style="text-align:right;font-weight:700;color:#7c3aed">2,250,000</td>
+        </tr><tr data-search="the integrated initiative of european laser research infrastructures infraia-01-2018-2019 h2020_projects_trimmed">
+          <td>The Integrated Initiative of European Laser Research Infrastructures</td>
+          <td><span class="chip chip-topic">INFRAIA-01-2018-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1856742.0" style="text-align:right">1,856,742</td>
+          <td data-num="392500.0" style="text-align:right">392,500</td>
+          <td data-num="2249242.0" style="text-align:right;font-weight:700;color:#7c3aed">2,249,242</td>
+        </tr><tr data-search="nan nan nan">
+          <td>nan</td>
+          <td><span class="chip chip-topic">nan</span></td>
+          <td><span class="chip chip-prog">nan</span></td>
+          <td data-num="131371.25" style="text-align:right">131,371</td>
+          <td data-num="2116872.5" style="text-align:right">2,116,872</td>
+          <td data-num="2248243.75" style="text-align:right;font-weight:700;color:#7c3aed">2,248,244</td>
+        </tr><tr data-search="rf engineered substrates to foster fem performance ecsel-01-2015 h2020_projects_trimmed">
+          <td>Rf Engineered substrates to FostER fEm performaNCE</td>
+          <td><span class="chip chip-topic">ECSEL-01-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="2240924.5" style="text-align:right">2,240,924</td>
+          <td data-num="2240924.5" style="text-align:right;font-weight:700;color:#7c3aed">2,240,924</td>
+        </tr><tr data-search="improving the sustainability of the european magnetic field laboratory infradev-03-2018-2019 h2020_projects_trimmed">
+          <td>Improving the sustainability of the European Magnetic Field Laboratory</td>
+          <td><span class="chip chip-topic">INFRADEV-03-2018-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1998925.0" style="text-align:right">1,998,925</td>
+          <td data-num="146250.0" style="text-align:right">146,250</td>
+          <td data-num="2145175.0" style="text-align:right;font-weight:700;color:#7c3aed">2,145,175</td>
+        </tr><tr data-search="battery interface genome - materials acceleration platform lc-bat-12-2020 h2020_projects_trimmed">
+          <td>Battery Interface Genome - Materials Acceleration Platform</td>
+          <td><span class="chip chip-topic">LC-BAT-12-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1167985.0" style="text-align:right">1,167,985</td>
+          <td data-num="905714.16" style="text-align:right">905,714</td>
+          <td data-num="2073699.1600000001" style="text-align:right;font-weight:700;color:#7c3aed">2,073,699</td>
+        </tr><tr data-search="electronic generation and detection in nanoelectronic devices at the picosecond scale fetopen-01-2018-2019-2020 h2020_projects_trimmed">
+          <td>Electronic generation and detection in nanoelectronic devices at the picosecond scale</td>
+          <td><span class="chip chip-topic">FETOPEN-01-2018-2019-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1009726.25" style="text-align:right">1,009,726</td>
+          <td data-num="1053757.5" style="text-align:right">1,053,758</td>
+          <td data-num="2063483.75" style="text-align:right;font-weight:700;color:#7c3aed">2,063,484</td>
+        </tr><tr data-search="gateone - innovation service for european smartization by smes ict-02-2014 h2020_projects_trimmed">
+          <td>GateOne - Innovation Service for European Smartization by SMEs</td>
+          <td><span class="chip chip-topic">ICT-02-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="479687.5" style="text-align:right">479,688</td>
+          <td data-num="1575158.75" style="text-align:right">1,575,159</td>
+          <td data-num="2054846.25" style="text-align:right;font-weight:700;color:#7c3aed">2,054,846</td>
+        </tr><tr data-search="observation-based system for monitoring and verification of greenhouse gases sc5-04-2017 h2020_projects_trimmed">
+          <td>Observation-based system for monitoring and verification of greenhouse gases</td>
+          <td><span class="chip chip-topic">SC5-04-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="2018586.25" style="text-align:right">2,018,586</td>
+          <td data-num="2018586.25" style="text-align:right;font-weight:700;color:#7c3aed">2,018,586</td>
+        </tr><tr data-search="dynamic nuclear polarization at ultra-fast sample spinning and ultra-low temperature erc-cog-2015 h2020_projects_trimmed">
+          <td>Dynamic Nuclear Polarization at ultra-fast sample spinning and ultra-low temperature</td>
+          <td><span class="chip chip-topic">ERC-CoG-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="40000.0" style="text-align:right">40,000</td>
+          <td data-num="1959805.42" style="text-align:right">1,959,805</td>
+          <td data-num="1999805.42" style="text-align:right;font-weight:700;color:#7c3aed">1,999,805</td>
+        </tr><tr data-search="single electron detection in transmission electron microscopy erc-2017-stg h2020_projects_trimmed">
+          <td>Single electron detection in Transmission Electron Microscopy</td>
+          <td><span class="chip chip-topic">ERC-2017-STG</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1938958.0" style="text-align:right">1,938,958</td>
+          <td data-num="60000.0" style="text-align:right">60,000</td>
+          <td data-num="1998958.0" style="text-align:right;font-weight:700;color:#7c3aed">1,998,958</td>
+        </tr><tr data-search="ice core dating tools revisited to infer the dynamic of glacial – interglacial transitions over the last 1.5 million years erc-2018-cog h2020_projects_trimmed">
+          <td>Ice CORe DAting tools revisited to infer the dynamic of glacial – interglacial transitions over the last 1.5 million years</td>
+          <td><span class="chip chip-topic">ERC-2018-COG</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1994100.0" style="text-align:right">1,994,100</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1994100.0" style="text-align:right;font-weight:700;color:#7c3aed">1,994,100</td>
+        </tr><tr data-search="environmental research infrastructures providing shared solutions for science and society infradev-4-2014-2015 h2020_projects_trimmed">
+          <td>Environmental Research Infrastructures Providing Shared Solutions for Science and Society</td>
+          <td><span class="chip chip-topic">INFRADEV-4-2014-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1600438.0" style="text-align:right">1,600,438</td>
+          <td data-num="387717.5" style="text-align:right">387,718</td>
+          <td data-num="1988155.5" style="text-align:right;font-weight:700;color:#7c3aed">1,988,156</td>
+        </tr><tr data-search="metrology advances for digitized ecs industry 4.0 ecsel-2018-1-ia h2020_projects_trimmed">
+          <td>Metrology Advances for Digitized ECS industry 4.0</td>
+          <td><span class="chip chip-topic">ECSEL-2018-1-IA</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="280000.0" style="text-align:right">280,000</td>
+          <td data-num="1694459.38" style="text-align:right">1,694,459</td>
+          <td data-num="1974459.38" style="text-align:right;font-weight:700;color:#7c3aed">1,974,459</td>
+        </tr><tr data-search="sustainable autonomy and resilience for leas using ai against high priority threats su-ai02-2020 h2020_projects_trimmed">
+          <td>Sustainable Autonomy and Resilience for LEAs using AI against High priority Threats</td>
+          <td><span class="chip chip-topic">SU-AI02-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="298750.0" style="text-align:right">298,750</td>
+          <td data-num="1653163.78" style="text-align:right">1,653,164</td>
+          <td data-num="1951913.78" style="text-align:right;font-weight:700;color:#7c3aed">1,951,914</td>
+        </tr><tr data-search="laser-plasma based source 3d tomography for cargo inspection su-bes02-2018-2019-2020 h2020_projects_trimmed">
+          <td>Laser-plasma based source 3D Tomography for cargo inspection</td>
+          <td><span class="chip chip-topic">SU-BES02-2018-2019-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="332690.0" style="text-align:right">332,690</td>
+          <td data-num="1561525.0" style="text-align:right">1,561,525</td>
+          <td data-num="1894215.0" style="text-align:right;font-weight:700;color:#7c3aed">1,894,215</td>
+        </tr><tr data-search="energy oriented center of excellence : toward exascale for energy infraedi-02-2018 h2020_projects_trimmed">
+          <td>Energy Oriented Center of Excellence : toward exascale for energy</td>
+          <td><span class="chip chip-topic">INFRAEDI-02-2018</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="452949.0" style="text-align:right">452,949</td>
+          <td data-num="1423535.0" style="text-align:right">1,423,535</td>
+          <td data-num="1876484.0" style="text-align:right;font-weight:700;color:#7c3aed">1,876,484</td>
+        </tr><tr data-search="robotic manipulation for nuclear sort and segregation ict-23-2014 h2020_projects_trimmed">
+          <td>Robotic Manipulation for Nuclear Sort and Segregation</td>
+          <td><span class="chip chip-topic">ICT-23-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="805100.0" style="text-align:right">805,100</td>
+          <td data-num="1065561.0" style="text-align:right">1,065,561</td>
+          <td data-num="1870661.0" style="text-align:right;font-weight:700;color:#7c3aed">1,870,661</td>
+        </tr><tr data-search="european network for developing new horizons for ris infrasupp-01-2018-2019 h2020_projects_trimmed">
+          <td>European network for developing new horizons for RIs</td>
+          <td><span class="chip chip-topic">INFRASUPP-01-2018-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="557267.5" style="text-align:right">557,268</td>
+          <td data-num="1303102.5" style="text-align:right">1,303,102</td>
+          <td data-num="1860370.0" style="text-align:right;font-weight:700;color:#7c3aed">1,860,370</td>
+        </tr><tr data-search="small-scale solar thermal combined cycle lce-07-2016-2017 h2020_projects_trimmed">
+          <td>Small-Scale Solar Thermal Combined Cycle</td>
+          <td><span class="chip chip-topic">LCE-07-2016-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1053181.25" style="text-align:right">1,053,181</td>
+          <td data-num="793976.25" style="text-align:right">793,976</td>
+          <td data-num="1847157.5" style="text-align:right;font-weight:700;color:#7c3aed">1,847,158</td>
+        </tr><tr data-search="innovative physical/virtual sensor platform for battery cell lc-bat-13-2020 h2020_projects_trimmed">
+          <td>Innovative physical/virtual sensor platform for battery cell</td>
+          <td><span class="chip chip-topic">LC-BAT-13-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="691250.0" style="text-align:right">691,250</td>
+          <td data-num="1150256.25" style="text-align:right">1,150,256</td>
+          <td data-num="1841506.25" style="text-align:right;font-weight:700;color:#7c3aed">1,841,506</td>
+        </tr><tr data-search="neuronal microscopy for cell behavioural examination and manipulation ict-36-2020 h2020_projects_trimmed">
+          <td>Neuronal microscopy for cell behavioural examination and manipulation</td>
+          <td><span class="chip chip-topic">ICT-36-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1829606.25" style="text-align:right">1,829,606</td>
+          <td data-num="1829606.25" style="text-align:right;font-weight:700;color:#7c3aed">1,829,606</td>
+        </tr><tr data-search="corona accelerated r&amp;d in europe imi2-2020-21-01 h2020_projects_trimmed">
+          <td>Corona Accelerated R&amp;D in Europe</td>
+          <td><span class="chip chip-topic">IMI2-2020-21-01</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1824570.0" style="text-align:right">1,824,570</td>
+          <td data-num="1824570.0" style="text-align:right;font-weight:700;color:#7c3aed">1,824,570</td>
+        </tr><tr data-search="solar facilities for the european research area - third phase infraia-01-2018-2019 h2020_projects_trimmed">
+          <td>Solar Facilities for the European Research Area - Third Phase</td>
+          <td><span class="chip chip-topic">INFRAIA-01-2018-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1041126.26" style="text-align:right">1,041,126</td>
+          <td data-num="767033.59" style="text-align:right">767,034</td>
+          <td data-num="1808159.85" style="text-align:right;font-weight:700;color:#7c3aed">1,808,160</td>
+        </tr><tr data-search="energy oriented centre of excellence for computer applications einfra-5-2015 h2020_projects_trimmed">
+          <td>Energy oriented Centre of Excellence for computer applications</td>
+          <td><span class="chip chip-topic">EINFRA-5-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1803600.0" style="text-align:right">1,803,600</td>
+          <td data-num="1803600.0" style="text-align:right;font-weight:700;color:#7c3aed">1,803,600</td>
+        </tr><tr data-search="european nuclear science and application research 2 infraia-1-2014-2015 h2020_projects_trimmed">
+          <td>European Nuclear Science and Application Research 2</td>
+          <td><span class="chip chip-topic">INFRAIA-1-2014-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1250920.0" style="text-align:right">1,250,920</td>
+          <td data-num="499250.0" style="text-align:right">499,250</td>
+          <td data-num="1750170.0" style="text-align:right;font-weight:700;color:#7c3aed">1,750,170</td>
+        </tr><tr data-search="infrastructure for the european network for earth system modelling - phase 3 infraia-01-2018-2019 h2020_projects_trimmed">
+          <td>Infrastructure for the European Network for Earth System modelling - Phase 3</td>
+          <td><span class="chip chip-topic">INFRAIA-01-2018-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1705100.0" style="text-align:right">1,705,100</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1705100.0" style="text-align:right;font-weight:700;color:#7c3aed">1,705,100</td>
+        </tr><tr data-search="heterogeneous integrated magnetic technology using multifunctional standardized stack (mss) ict-25-2015 h2020_projects_trimmed">
+          <td>heteroGeneous integRated magnetic tEchnology using multifunctional standardized sTack (MSS)</td>
+          <td><span class="chip chip-topic">ICT-25-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="775549.0" style="text-align:right">775,549</td>
+          <td data-num="922833.49" style="text-align:right">922,833</td>
+          <td data-num="1698382.49" style="text-align:right;font-weight:700;color:#7c3aed">1,698,382</td>
+        </tr><tr data-search="3d multi-process sequential integration for smart sensor interfaces ict-31-2017 h2020_projects_trimmed">
+          <td>3D Multi-Process Sequential Integration for Smart Sensor Interfaces</td>
+          <td><span class="chip chip-topic">ICT-31-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1607728.75" style="text-align:right">1,607,729</td>
+          <td data-num="1607728.75" style="text-align:right;font-weight:700;color:#7c3aed">1,607,729</td>
+        </tr><tr data-search="international development of ganil-spiral2 infradev-03-2016-2017 h2020_projects_trimmed">
+          <td>International Development of gAnil-spirAL2</td>
+          <td><span class="chip chip-topic">INFRADEV-03-2016-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="924025.0" style="text-align:right">924,025</td>
+          <td data-num="682875.0" style="text-align:right">682,875</td>
+          <td data-num="1606900.0" style="text-align:right;font-weight:700;color:#7c3aed">1,606,900</td>
+        </tr><tr data-search="magnetic nanoparticle based liquid energy materials for thermoelectric device applications fetproact-01-2016 h2020_projects_trimmed">
+          <td>MAGnetic nanoparticle based liquid ENergy materials for Thermoelectric device Applications</td>
+          <td><span class="chip chip-topic">FETPROACT-01-2016</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="729146.25" style="text-align:right">729,146</td>
+          <td data-num="853161.25" style="text-align:right">853,161</td>
+          <td data-num="1582307.5" style="text-align:right;font-weight:700;color:#7c3aed">1,582,308</td>
+        </tr><tr data-search="pan ebola vaccine innovative approach – sofia ref.: 116088 imi2-2015-08-01 h2020_projects_trimmed">
+          <td>PAN EBOLA VACCINE INNOVATIVE APPROACH – Sofia ref.: 116088</td>
+          <td><span class="chip chip-topic">IMI2-2015-08-01</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="533332.0" style="text-align:right">533,332</td>
+          <td data-num="1040108.0" style="text-align:right">1,040,108</td>
+          <td data-num="1573440.0" style="text-align:right;font-weight:700;color:#7c3aed">1,573,440</td>
+        </tr><tr data-search="improving diagnosis by fast field-cycling mri phc-11-2015 h2020_projects_trimmed">
+          <td>Improving Diagnosis by Fast Field-Cycling MRI</td>
+          <td><span class="chip chip-topic">PHC-11-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="367560.0" style="text-align:right">367,560</td>
+          <td data-num="1173041.25" style="text-align:right">1,173,041</td>
+          <td data-num="1540601.25" style="text-align:right;font-weight:700;color:#7c3aed">1,540,601</td>
+        </tr><tr data-search="nan nan nan">
+          <td>nan</td>
+          <td><span class="chip chip-topic">nan</span></td>
+          <td><span class="chip chip-prog">nan</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1502956.25" style="text-align:right">1,502,956</td>
+          <td data-num="1502956.25" style="text-align:right;font-weight:700;color:#7c3aed">1,502,956</td>
+        </tr><tr data-search="structural studies of mammalian cys-loop receptors erc-stg-2014 h2020_projects_trimmed">
+          <td>Structural studies of mammalian Cys-loop receptors</td>
+          <td><span class="chip chip-topic">ERC-StG-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1500000.0" style="text-align:right">1,500,000</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1500000.0" style="text-align:right;font-weight:700;color:#7c3aed">1,500,000</td>
+        </tr><tr data-search="nan nan nan">
+          <td>nan</td>
+          <td><span class="chip chip-topic">nan</span></td>
+          <td><span class="chip chip-prog">nan</span></td>
+          <td data-num="1500000.0" style="text-align:right">1,500,000</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1500000.0" style="text-align:right;font-weight:700;color:#7c3aed">1,500,000</td>
+        </tr><tr data-search="k-space neural  computation with magnetic excitations fetopen-01-2018-2019-2020 h2020_projects_trimmed">
+          <td>k-space Neural  computation with magnEtic exciTations</td>
+          <td><span class="chip chip-topic">FETOPEN-01-2018-2019-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1049862.5" style="text-align:right">1,049,862</td>
+          <td data-num="449993.75" style="text-align:right">449,994</td>
+          <td data-num="1499856.25" style="text-align:right;font-weight:700;color:#7c3aed">1,499,856</td>
+        </tr><tr data-search="reconfigurable intelligent sustainable environments for 6g wireless networks ict-52-2020 h2020_projects_trimmed">
+          <td>Reconfigurable Intelligent Sustainable Environments for 6G Wireless Networks</td>
+          <td><span class="chip chip-topic">ICT-52-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="349276.25" style="text-align:right">349,276</td>
+          <td data-num="1145601.25" style="text-align:right">1,145,601</td>
+          <td data-num="1494877.5" style="text-align:right;font-weight:700;color:#7c3aed">1,494,878</td>
+        </tr><tr data-search="spin-orbit mechanism in adaptive magnetization-reversal techniques, for magnetic memory design erc-stg-2014 h2020_projects_trimmed">
+          <td>Spin-orbit mechanism in adaptive magnetization-reversal techniques, for magnetic memory design</td>
+          <td><span class="chip chip-topic">ERC-StG-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1476000.0" style="text-align:right">1,476,000</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1476000.0" style="text-align:right;font-weight:700;color:#7c3aed">1,476,000</td>
+        </tr><tr data-search="energy efficient embedded non-volatile memory  logic based on ferroelectric hf(zr)o2 ict-31-2017 h2020_projects_trimmed">
+          <td>Energy Efficient Embedded Non-volatile Memory  Logic based on Ferroelectric Hf(Zr)O2</td>
+          <td><span class="chip chip-topic">ICT-31-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1462493.95" style="text-align:right">1,462,494</td>
+          <td data-num="1462493.95" style="text-align:right;font-weight:700;color:#7c3aed">1,462,494</td>
+        </tr><tr data-search="myrrha research and transmutation endeavour nfrp-09-2015 h2020_projects_trimmed">
+          <td>MYRRHA Research and Transmutation Endeavour</td>
+          <td><span class="chip chip-topic">NFRP-09-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1068128.0" style="text-align:right">1,068,128</td>
+          <td data-num="393725.0" style="text-align:right">393,725</td>
+          <td data-num="1461853.0" style="text-align:right;font-weight:700;color:#7c3aed">1,461,853</td>
+        </tr><tr data-search="modeling unconventional nanoscaled device fabrication ict-06-2019 h2020_projects_trimmed">
+          <td>Modeling Unconventional Nanoscaled Device FABrication</td>
+          <td><span class="chip chip-topic">ICT-06-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="660065.0" style="text-align:right">660,065</td>
+          <td data-num="786618.75" style="text-align:right">786,619</td>
+          <td data-num="1446683.75" style="text-align:right;font-weight:700;color:#7c3aed">1,446,684</td>
+        </tr><tr data-search="carbon nanotube composite  interconnects ict-25-2015 h2020_projects_trimmed">
+          <td>CarbON Nanotube compositE  InterconneCTs</td>
+          <td><span class="chip chip-topic">ICT-25-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="380043.75" style="text-align:right">380,044</td>
+          <td data-num="1044500.0" style="text-align:right">1,044,500</td>
+          <td data-num="1424543.75" style="text-align:right;font-weight:700;color:#7c3aed">1,424,544</td>
+        </tr><tr data-search="atlantic ecosystems assessment, forecasting &amp; sustainability bg-08-2018-2019 h2020_projects_trimmed">
+          <td>Atlantic ECOsystems assessment, forecasting &amp; sustainability</td>
+          <td><span class="chip chip-topic">BG-08-2018-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="562706.63" style="text-align:right">562,707</td>
+          <td data-num="859257.5" style="text-align:right">859,258</td>
+          <td data-num="1421964.13" style="text-align:right;font-weight:700;color:#7c3aed">1,421,964</td>
+        </tr><tr data-search="smart technologies for energy efficient active cooling in advanced microelectronic systems ict-25-2015 h2020_projects_trimmed">
+          <td>Smart Technologies for eneRgy Efficient Active cooling in advanced Microelectronic Systems</td>
+          <td><span class="chip chip-topic">ICT-25-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="522295.0" style="text-align:right">522,295</td>
+          <td data-num="895452.5" style="text-align:right">895,452</td>
+          <td data-num="1417747.5" style="text-align:right;font-weight:700;color:#7c3aed">1,417,748</td>
+        </tr><tr data-search="investigations supporting mox fuel licensing in esnii prototype reactors nfrp-5 h2020_projects_trimmed">
+          <td>Investigations Supporting MOX Fuel Licensing in ESNII Prototype Reactors</td>
+          <td><span class="chip chip-topic">NFRP-5</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="328000.0" style="text-align:right">328,000</td>
+          <td data-num="1083946.17" style="text-align:right">1,083,946</td>
+          <td data-num="1411946.17" style="text-align:right;font-weight:700;color:#7c3aed">1,411,946</td>
+        </tr><tr data-search="advanced european infrastructures for detectors at accelerators infraia-1-2014-2015 h2020_projects_trimmed">
+          <td>Advanced European Infrastructures for Detectors at Accelerators</td>
+          <td><span class="chip chip-topic">INFRAIA-1-2014-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1248300.0" style="text-align:right">1,248,300</td>
+          <td data-num="161000.0" style="text-align:right">161,000</td>
+          <td data-num="1409300.0" style="text-align:right;font-weight:700;color:#7c3aed">1,409,300</td>
+        </tr><tr data-search="volumetric medical x-ray imaging at extremely low dose fetopen-ria-2014-2015 h2020_projects_trimmed">
+          <td>volumetric medical x-ray imaging at extremely low dose</td>
+          <td><span class="chip chip-topic">FETOPEN-RIA-2014-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="846250.0" style="text-align:right">846,250</td>
+          <td data-num="510000.0" style="text-align:right">510,000</td>
+          <td data-num="1356250.0" style="text-align:right;font-weight:700;color:#7c3aed">1,356,250</td>
+        </tr><tr data-search="isotopic labeling for drug innovation msca-itn-2015-etn h2020_projects_trimmed">
+          <td>ISOTOPIC LABELING FOR DRUG INNOVATION</td>
+          <td><span class="chip chip-topic">MSCA-ITN-2015-ETN</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="262875.6" style="text-align:right">262,876</td>
+          <td data-num="1051502.4" style="text-align:right">1,051,502</td>
+          <td data-num="1314378.0" style="text-align:right;font-weight:700;color:#7c3aed">1,314,378</td>
+        </tr><tr data-search="pre-disposal management of radioactive waste nfrp-2019-2020-10 h2020_projects_trimmed">
+          <td>PRE-DISposal management of radioactive waste</td>
+          <td><span class="chip chip-topic">NFRP-2019-2020-10</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="184589.0" style="text-align:right">184,589</td>
+          <td data-num="1116269.0" style="text-align:right">1,116,269</td>
+          <td data-num="1300858.0" style="text-align:right;font-weight:700;color:#7c3aed">1,300,858</td>
+        </tr><tr data-search="topological solitons in antiferroics fetopen-01-2018-2019-2020 h2020_projects_trimmed">
+          <td>Topological Solitons in Antiferroics</td>
+          <td><span class="chip chip-topic">FETOPEN-01-2018-2019-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="785835.0" style="text-align:right">785,835</td>
+          <td data-num="492712.5" style="text-align:right">492,712</td>
+          <td data-num="1278547.5" style="text-align:right;font-weight:700;color:#7c3aed">1,278,548</td>
+        </tr><tr data-search="accelerator research and innovation for european science and society infraia-01-2016-2017 h2020_projects_trimmed">
+          <td>Accelerator Research and Innovation for European Science and Society</td>
+          <td><span class="chip chip-topic">INFRAIA-01-2016-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="600868.6" style="text-align:right">600,869</td>
+          <td data-num="648487.4" style="text-align:right">648,487</td>
+          <td data-num="1249356.0" style="text-align:right;font-weight:700;color:#7c3aed">1,249,356</td>
+        </tr><tr data-search="hgcdte apd optimization for lidar detection of greenhouse gases compet-2-2017 h2020_projects_trimmed">
+          <td>HgCdte APD Optimization for Lidar Detection Of greeNhouse gases</td>
+          <td><span class="chip chip-topic">COMPET-2-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1239490.0" style="text-align:right">1,239,490</td>
+          <td data-num="1239490.0" style="text-align:right;font-weight:700;color:#7c3aed">1,239,490</td>
+        </tr><tr data-search="boosting performance of phase change devices by hetero- and nano-structure material design ict-07-2018 h2020_projects_trimmed">
+          <td>Boosting Performance of Phase Change Devices by Hetero- and Nano-Structure Material Design</td>
+          <td><span class="chip chip-topic">ICT-07-2018</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="306892.5" style="text-align:right">306,892</td>
+          <td data-num="919950.0" style="text-align:right">919,950</td>
+          <td data-num="1226842.5" style="text-align:right;font-weight:700;color:#7c3aed">1,226,842</td>
+        </tr><tr data-search="safe long term operation of light water reactors based on improved understanding of radiation effects in nuclear structural materials nfrp-01-2014 h2020_projects_trimmed">
+          <td>Safe long term operation of light water reactors based on improved understanding of radiation effects in nuclear structural materials</td>
+          <td><span class="chip chip-topic">NFRP-01-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="336348.0" style="text-align:right">336,348</td>
+          <td data-num="890000.0" style="text-align:right">890,000</td>
+          <td data-num="1226348.0" style="text-align:right;font-weight:700;color:#7c3aed">1,226,348</td>
+        </tr><tr data-search="multiscale modelling for fusion and fission materials nfrp-13 h2020_projects_trimmed">
+          <td>MULTISCALE MODELLING FOR FUSION AND FISSION MATERIALS</td>
+          <td><span class="chip chip-topic">NFRP-13</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="510000.0" style="text-align:right">510,000</td>
+          <td data-num="670000.0" style="text-align:right">670,000</td>
+          <td data-num="1180000.0" style="text-align:right;font-weight:700;color:#7c3aed">1,180,000</td>
+        </tr><tr data-search="optimizing response to li treatment through personalized evaluation of individuals with bipolar i disorder: the r-link initiative sc1-pm-02-2017 h2020_projects_trimmed">
+          <td>Optimizing response to Li treatment through personalized evaluation of individuals with bipolar I disorder: the R-LiNK initiative</td>
+          <td><span class="chip chip-topic">SC1-PM-02-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="349651.25" style="text-align:right">349,651</td>
+          <td data-num="818006.25" style="text-align:right">818,006</td>
+          <td data-num="1167657.5" style="text-align:right;font-weight:700;color:#7c3aed">1,167,658</td>
+        </tr><tr data-search="green electronics with diamond power devices lce-01-2014 h2020_projects_trimmed">
+          <td>Green Electronics with Diamond Power Devices</td>
+          <td><span class="chip chip-topic">LCE-01-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="889500.0" style="text-align:right">889,500</td>
+          <td data-num="270000.0" style="text-align:right">270,000</td>
+          <td data-num="1159500.0" style="text-align:right;font-weight:700;color:#7c3aed">1,159,500</td>
+        </tr><tr data-search="gan for advanced power applications ecsel-2020-1-ia h2020_projects_trimmed">
+          <td>GaN for Advanced Power Applications</td>
+          <td><span class="chip chip-topic">ECSEL-2020-1-IA</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="300294.31" style="text-align:right">300,294</td>
+          <td data-num="850799.69" style="text-align:right">850,800</td>
+          <td data-num="1151094.0" style="text-align:right;font-weight:700;color:#7c3aed">1,151,094</td>
+        </tr><tr data-search="a paradigm shift in reactor safety with the molten salt fast reactor nfrp-03-2014 h2020_projects_trimmed">
+          <td>A Paradigm Shift in Reactor Safety with the Molten Salt Fast Reactor</td>
+          <td><span class="chip chip-topic">NFRP-03-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1050000.0" style="text-align:right">1,050,000</td>
+          <td data-num="99922.0" style="text-align:right">99,922</td>
+          <td data-num="1149922.0" style="text-align:right;font-weight:700;color:#7c3aed">1,149,922</td>
+        </tr><tr data-search="petahertz quantum optoelectronic communication fetopen-01-2018-2019-2020 h2020_projects_trimmed">
+          <td>Petahertz Quantum Optoelectronic Communication</td>
+          <td><span class="chip chip-topic">FETOPEN-01-2018-2019-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1139450.0" style="text-align:right">1,139,450</td>
+          <td data-num="1139450.0" style="text-align:right;font-weight:700;color:#7c3aed">1,139,450</td>
+        </tr><tr data-search="advancement and innovation for detectors at accelerators infrainnov-04-2020 h2020_projects_trimmed">
+          <td>Advancement and Innovation for Detectors at Accelerators</td>
+          <td><span class="chip chip-topic">INFRAINNOV-04-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1067187.5" style="text-align:right">1,067,188</td>
+          <td data-num="50000.0" style="text-align:right">50,000</td>
+          <td data-num="1117187.5" style="text-align:right;font-weight:700;color:#7c3aed">1,117,188</td>
+        </tr><tr data-search="gen iv integrated oxide fuels recycling strategies nfrp-3 h2020_projects_trimmed">
+          <td>GEN IV Integrated Oxide fuels recycling strategies</td>
+          <td><span class="chip chip-topic">NFRP-3</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="306811.42" style="text-align:right">306,811</td>
+          <td data-num="797702.54" style="text-align:right">797,703</td>
+          <td data-num="1104513.96" style="text-align:right;font-weight:700;color:#7c3aed">1,104,514</td>
+        </tr><tr data-search="quantum dots for photonic quantum information technologies msca-itn-2019 h2020_projects_trimmed">
+          <td>Quantum Dots for Photonic Quantum Information Technologies</td>
+          <td><span class="chip chip-topic">MSCA-ITN-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="824406.12" style="text-align:right">824,406</td>
+          <td data-num="274802.04" style="text-align:right">274,802</td>
+          <td data-num="1099208.16" style="text-align:right;font-weight:700;color:#7c3aed">1,099,208</td>
+        </tr><tr data-search="optomechanics for virology fetproact-01-2016 h2020_projects_trimmed">
+          <td>Optomechanics for Virology</td>
+          <td><span class="chip chip-topic">FETPROACT-01-2016</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1098870.0" style="text-align:right">1,098,870</td>
+          <td data-num="1098870.0" style="text-align:right;font-weight:700;color:#7c3aed">1,098,870</td>
+        </tr><tr data-search="reservoir computing with real-time data for future it fetopen-ria-2014-2015 h2020_projects_trimmed">
+          <td>Reservoir Computing with Real-time Data for future IT</td>
+          <td><span class="chip chip-topic">FETOPEN-RIA-2014-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="672160.0" style="text-align:right">672,160</td>
+          <td data-num="396573.75" style="text-align:right">396,574</td>
+          <td data-num="1068733.75" style="text-align:right;font-weight:700;color:#7c3aed">1,068,734</td>
+        </tr><tr data-search="earth system models for the future lc-cla-18-2020 h2020_projects_trimmed">
+          <td>Earth system models for the future</td>
+          <td><span class="chip chip-topic">LC-CLA-18-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="1042986.25" style="text-align:right">1,042,986</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="1042986.25" style="text-align:right;font-weight:700;color:#7c3aed">1,042,986</td>
+        </tr><tr data-search="metamaterials antenna for ultra-high field mri fetopen-01-2016-2017 h2020_projects_trimmed">
+          <td>MetaMaterials antenna for ultra-high field MRI</td>
+          <td><span class="chip chip-topic">FETOPEN-01-2016-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="312250.0" style="text-align:right">312,250</td>
+          <td data-num="705256.25" style="text-align:right">705,256</td>
+          <td data-num="1017506.25" style="text-align:right;font-weight:700;color:#7c3aed">1,017,506</td>
+        </tr><tr data-search="extreme events: artificial intelligence for detection and attribution lc-cla-12-2020 h2020_projects_trimmed">
+          <td>EXTREME EVENTS: ARTIFICIAL INTELLIGENCE FOR DETECTION AND ATTRIBUTION</td>
+          <td><span class="chip chip-topic">LC-CLA-12-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="996292.44" style="text-align:right">996,292</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="996292.44" style="text-align:right;font-weight:700;color:#7c3aed">996,292</td>
+        </tr><tr data-search="nanoscience foundries and fine analysis - europe infraia-1-2014-2015 h2020_projects_trimmed">
+          <td>NANOSCIENCE FOUNDRIES AND FINE ANALYSIS - EUROPE</td>
+          <td><span class="chip chip-topic">INFRAIA-1-2014-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="685834.29" style="text-align:right">685,834</td>
+          <td data-num="298728.65" style="text-align:right">298,729</td>
+          <td data-num="984562.9400000001" style="text-align:right;font-weight:700;color:#7c3aed">984,563</td>
+        </tr><tr data-search="biofuels from waste to road transport lc-sc3-res-21-2018 h2020_projects_trimmed">
+          <td>Biofuels from WASTE TO ROAD transport</td>
+          <td><span class="chip chip-topic">LC-SC3-RES-21-2018</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="590000.0" style="text-align:right">590,000</td>
+          <td data-num="394535.0" style="text-align:right">394,535</td>
+          <td data-num="984535.0" style="text-align:right;font-weight:700;color:#7c3aed">984,535</td>
+        </tr><tr data-search="preventive solutions for sensitive materials of cultural heritage nmbp-33-2018 h2020_projects_trimmed">
+          <td>Preventive solutions for Sensitive Materials of Cultural Heritage</td>
+          <td><span class="chip chip-topic">NMBP-33-2018</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="290305.39" style="text-align:right">290,305</td>
+          <td data-num="690473.84" style="text-align:right">690,474</td>
+          <td data-num="980779.23" style="text-align:right;font-weight:700;color:#7c3aed">980,779</td>
+        </tr><tr data-search="integrated activities for the high energy astrophysics domain infraia-01-2018-2019 h2020_projects_trimmed">
+          <td>Integrated Activities for the High Energy Astrophysics Domain</td>
+          <td><span class="chip chip-topic">INFRAIA-01-2018-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="441355.0" style="text-align:right">441,355</td>
+          <td data-num="529464.96" style="text-align:right">529,465</td>
+          <td data-num="970819.96" style="text-align:right;font-weight:700;color:#7c3aed">970,820</td>
+        </tr><tr data-search="cmos solutions for mid-board integrated transceivers with breakthrough connectivity at ultra-low cost ict-27-2015 h2020_projects_trimmed">
+          <td>CmOs Solutions for Mid-board Integrated transceivers with breakthrough Connectivity at ultra-low Cost</td>
+          <td><span class="chip chip-topic">ICT-27-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="962607.5" style="text-align:right">962,608</td>
+          <td data-num="962607.5" style="text-align:right;font-weight:700;color:#7c3aed">962,608</td>
+        </tr><tr data-search="innovation fostering in accelerator science and technology infrainnov-04-2020 h2020_projects_trimmed">
+          <td>Innovation Fostering in Accelerator Science and Technology</td>
+          <td><span class="chip chip-topic">INFRAINNOV-04-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="513875.0" style="text-align:right">513,875</td>
+          <td data-num="399137.5" style="text-align:right">399,138</td>
+          <td data-num="913012.5" style="text-align:right;font-weight:700;color:#7c3aed">913,012</td>
+        </tr><tr data-search="atmospheric dynamics research infrastructure in europe infradev-1-2014 h2020_projects_trimmed">
+          <td>Atmospheric dynamics Research InfraStructure in Europe</td>
+          <td><span class="chip chip-topic">INFRADEV-1-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="340000.0" style="text-align:right">340,000</td>
+          <td data-num="570000.0" style="text-align:right">570,000</td>
+          <td data-num="910000.0" style="text-align:right;font-weight:700;color:#7c3aed">910,000</td>
+        </tr><tr data-search="accelerator and magnet infrastructure for cooperation and innovation infrainnov-02-2016 h2020_projects_trimmed">
+          <td>Accelerator and Magnet Infrastructure for Cooperation and Innovation</td>
+          <td><span class="chip chip-topic">INFRAINNOV-02-2016</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="218250.0" style="text-align:right">218,250</td>
+          <td data-num="687125.0" style="text-align:right">687,125</td>
+          <td data-num="905375.0" style="text-align:right;font-weight:700;color:#7c3aed">905,375</td>
+        </tr><tr data-search="mid infrared fully integrated chemical sensors ict-30-2017 h2020_projects_trimmed">
+          <td>mid infraREd Fully Integrated CHemical sensors</td>
+          <td><span class="chip chip-topic">ICT-30-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="900150.0" style="text-align:right">900,150</td>
+          <td data-num="900150.0" style="text-align:right;font-weight:700;color:#7c3aed">900,150</td>
+        </tr><tr data-search="severe accident modeling and safety assessment for fluid-fuel energy reactors nfrp-2018-2 h2020_projects_trimmed">
+          <td>Severe Accident Modeling and Safety Assessment for Fluid-fuel Energy Reactors</td>
+          <td><span class="chip chip-topic">NFRP-2018-2</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="651163.88" style="text-align:right">651,164</td>
+          <td data-num="243322.35" style="text-align:right">243,322</td>
+          <td data-num="894486.23" style="text-align:right;font-weight:700;color:#7c3aed">894,486</td>
+        </tr><tr data-search="integrating and managing services for the european open science cloud einfra-12-2017 h2020_projects_trimmed">
+          <td>Integrating and managing services for the European Open Science Cloud</td>
+          <td><span class="chip chip-topic">EINFRA-12-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="743999.28" style="text-align:right">743,999</td>
+          <td data-num="150073.0" style="text-align:right">150,073</td>
+          <td data-num="894072.28" style="text-align:right;font-weight:700;color:#7c3aed">894,072</td>
+        </tr><tr data-search="dissipationless topological channels for information transfer and quantum metrology fetproact-01-2018 h2020_projects_trimmed">
+          <td>Dissipationless topological channels for information transfer and quantum metrology</td>
+          <td><span class="chip chip-topic">FETPROACT-01-2018</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="411330.0" style="text-align:right">411,330</td>
+          <td data-num="470425.0" style="text-align:right">470,425</td>
+          <td data-num="881755.0" style="text-align:right;font-weight:700;color:#7c3aed">881,755</td>
+        </tr><tr data-search="supplying accurate nuclear data for energy and non-energy applications nfrp-2018-4 h2020_projects_trimmed">
+          <td>Supplying Accurate Nuclear Data for energy and non-energy Applications</td>
+          <td><span class="chip chip-topic">NFRP-2018-4</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="295701.0" style="text-align:right">295,701</td>
+          <td data-num="583026.0" style="text-align:right">583,026</td>
+          <td data-num="878727.0" style="text-align:right;font-weight:700;color:#7c3aed">878,727</td>
+        </tr><tr data-search="nan nan nan">
+          <td>nan</td>
+          <td><span class="chip chip-topic">nan</span></td>
+          <td><span class="chip chip-prog">nan</span></td>
+          <td data-num="452000.0" style="text-align:right">452,000</td>
+          <td data-num="425000.0" style="text-align:right">425,000</td>
+          <td data-num="877000.0" style="text-align:right;font-weight:700;color:#7c3aed">877,000</td>
+        </tr><tr data-search="simple, robust and cost-effective approaches to guide industry in the development of safer nanomaterials and nano-enabled products nmbp-15-2019 h2020_projects_trimmed">
+          <td>Simple, robust and cost-effective approaches to guide industry in the development of safer nanomaterials and nano-enabled products</td>
+          <td><span class="chip chip-topic">NMBP-15-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="399627.5" style="text-align:right">399,628</td>
+          <td data-num="455971.25" style="text-align:right">455,971</td>
+          <td data-num="855598.75" style="text-align:right;font-weight:700;color:#7c3aed">855,599</td>
+        </tr><tr data-search="restoring odorant detection and recognition in smell deficits fetopen-01-2018-2019-2020 h2020_projects_trimmed">
+          <td>Restoring Odorant detection and recognition in Smell dEficits</td>
+          <td><span class="chip chip-topic">FETOPEN-01-2018-2019-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="435838.75" style="text-align:right">435,839</td>
+          <td data-num="399260.0" style="text-align:right">399,260</td>
+          <td data-num="835098.75" style="text-align:right;font-weight:700;color:#7c3aed">835,099</td>
+        </tr><tr data-search="xmm-newton : a pathfinder for future multi-wavelength and multi-messenger observations with athena space-30-sci-2020 h2020_projects_trimmed">
+          <td>XMM-Newton : a pathfinder for future multi-wavelength and multi-messenger observations with Athena</td>
+          <td><span class="chip chip-topic">SPACE-30-SCI-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="657973.75" style="text-align:right">657,974</td>
+          <td data-num="168758.75" style="text-align:right">168,759</td>
+          <td data-num="826732.5" style="text-align:right;font-weight:700;color:#7c3aed">826,732</td>
+        </tr><tr data-search="biomechanics in health and disease: advanced physical tools for innovative early diagnosis msca-itn-2018 h2020_projects_trimmed">
+          <td>Biomechanics in health and disease: advanced physical tools for innovative early diagnosis</td>
+          <td><span class="chip chip-topic">MSCA-ITN-2018</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="549604.08" style="text-align:right">549,604</td>
+          <td data-num="274802.04" style="text-align:right">274,802</td>
+          <td data-num="824406.1199999999" style="text-align:right;font-weight:700;color:#7c3aed">824,406</td>
+        </tr><tr data-search="critical raw material electrocatalysts replacement enabling designed post-2020 pemfc fch-01-2-2017 h2020_projects_trimmed">
+          <td>Critical Raw material ElectrocatalystS replacement ENabling Designed pOst-2020 PEMFC</td>
+          <td><span class="chip chip-topic">FCH-01-2-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="448303.75" style="text-align:right">448,304</td>
+          <td data-num="362500.0" style="text-align:right">362,500</td>
+          <td data-num="810803.75" style="text-align:right;font-weight:700;color:#7c3aed">810,804</td>
+        </tr><tr data-search="one-stop-shop open access to  photonics innovation support for a digital europe dt-ict-04-2020 h2020_projects_trimmed">
+          <td>One-Stop-Shop Open Access to  Photonics Innovation Support for a Digital Europe</td>
+          <td><span class="chip chip-topic">DT-ICT-04-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="561743.5" style="text-align:right">561,744</td>
+          <td data-num="242961.75" style="text-align:right">242,962</td>
+          <td data-num="804705.25" style="text-align:right;font-weight:700;color:#7c3aed">804,705</td>
+        </tr><tr data-search="proposal for a horizon 2020 design study on the “european plasma research accelerator  with excellence in applications“ (eupraxia) infradev-1-2014 h2020_projects_trimmed">
+          <td>Proposal for a Horizon 2020 Design Study on the “European Plasma Research Accelerator  with eXcellence In Applications“ (EuPRAXIA)</td>
+          <td><span class="chip chip-topic">INFRADEV-1-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="526800.0" style="text-align:right">526,800</td>
+          <td data-num="263400.0" style="text-align:right">263,400</td>
+          <td data-num="790200.0" style="text-align:right;font-weight:700;color:#7c3aed">790,200</td>
+        </tr><tr data-search="prototype system for a copernicus co2 service iba-space-che2-2019 h2020_projects_trimmed">
+          <td>Prototype system for a Copernicus CO2 service</td>
+          <td><span class="chip chip-topic">IBA-SPACE-CHE2-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="200000.0" style="text-align:right">200,000</td>
+          <td data-num="590000.0" style="text-align:right">590,000</td>
+          <td data-num="790000.0" style="text-align:right;font-weight:700;color:#7c3aed">790,000</td>
+        </tr><tr data-search="promoting single cell genomics to explore the ecology and evolution of hidden microeukaryotes msca-itn-2015-etn h2020_projects_trimmed">
+          <td>Promoting SINgle cell GEnomics to explore the ecology and evolution of hidden microeuKaryotes</td>
+          <td><span class="chip chip-topic">MSCA-ITN-2015-ETN</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="788626.8" style="text-align:right">788,627</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="788626.8" style="text-align:right;font-weight:700;color:#7c3aed">788,627</td>
+        </tr><tr data-search="beyond epica oldest ice core: 1,5 myr of greenhouse gas – climate feedbacks lc-cla-08-2018 h2020_projects_trimmed">
+          <td>Beyond EPICA Oldest Ice Core: 1,5 Myr of greenhouse gas – climate feedbacks</td>
+          <td><span class="chip chip-topic">LC-CLA-08-2018</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="773500.0" style="text-align:right">773,500</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="773500.0" style="text-align:right;font-weight:700;color:#7c3aed">773,500</td>
+        </tr><tr data-search="the european robotics research infrastructure network infraia-02-2017 h2020_projects_trimmed">
+          <td>The European Robotics Research Infrastructure Network</td>
+          <td><span class="chip chip-topic">INFRAIA-02-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="385125.0" style="text-align:right">385,125</td>
+          <td data-num="384792.5" style="text-align:right">384,792</td>
+          <td data-num="769917.5" style="text-align:right;font-weight:700;color:#7c3aed">769,918</td>
+        </tr><tr data-search="superconducting magnets for the european  magnet field laboratory infradev-01-2019-2020 h2020_projects_trimmed">
+          <td>Superconducting magnets for the European  Magnet Field Laboratory</td>
+          <td><span class="chip chip-topic">INFRADEV-01-2019-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="396788.75" style="text-align:right">396,789</td>
+          <td data-num="370000.0" style="text-align:right">370,000</td>
+          <td data-num="766788.75" style="text-align:right;font-weight:700;color:#7c3aed">766,789</td>
+        </tr><tr data-search="revolutionary embedded memory for internet of things devices and energy reduction ict-25-2015 h2020_projects_trimmed">
+          <td>Revolutionary embedded memory for internet of things devices and energy reduction</td>
+          <td><span class="chip chip-topic">ICT-25-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="761596.25" style="text-align:right">761,596</td>
+          <td data-num="761596.25" style="text-align:right;font-weight:700;color:#7c3aed">761,596</td>
+        </tr><tr data-search="extended model of  organic semiconductors nmp-20-2014 h2020_projects_trimmed">
+          <td>EXTended Model of  Organic Semiconductors</td>
+          <td><span class="chip chip-topic">NMP-20-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="371250.0" style="text-align:right">371,250</td>
+          <td data-num="371250.0" style="text-align:right">371,250</td>
+          <td data-num="742500.0" style="text-align:right;font-weight:700;color:#7c3aed">742,500</td>
+        </tr><tr data-search="quantum internet alliance fetflag-03-2018 h2020_projects_trimmed">
+          <td>Quantum Internet Alliance</td>
+          <td><span class="chip chip-topic">FETFLAG-03-2018</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="624998.75" style="text-align:right">624,999</td>
+          <td data-num="114289.84" style="text-align:right">114,290</td>
+          <td data-num="739288.59" style="text-align:right;font-weight:700;color:#7c3aed">739,289</td>
+        </tr><tr data-search="nan nan nan">
+          <td>nan</td>
+          <td><span class="chip chip-topic">nan</span></td>
+          <td><span class="chip chip-prog">nan</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="738655.79" style="text-align:right">738,656</td>
+          <td data-num="738655.79" style="text-align:right;font-weight:700;color:#7c3aed">738,656</td>
+        </tr><tr data-search="european circular energy-frontier collider study infradev-1-2014 h2020_projects_trimmed">
+          <td>European Circular Energy-Frontier Collider Study</td>
+          <td><span class="chip chip-topic">INFRADEV-1-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="213000.0" style="text-align:right">213,000</td>
+          <td data-num="514000.0" style="text-align:right">514,000</td>
+          <td data-num="727000.0" style="text-align:right;font-weight:700;color:#7c3aed">727,000</td>
+        </tr><tr data-search="access to european infrastructure for nanoelectronics infraia-01-2018-2019 h2020_projects_trimmed">
+          <td>Access to European Infrastructure for Nanoelectronics</td>
+          <td><span class="chip chip-topic">INFRAIA-01-2018-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="240000.0" style="text-align:right">240,000</td>
+          <td data-num="485510.26" style="text-align:right">485,510</td>
+          <td data-num="725510.26" style="text-align:right;font-weight:700;color:#7c3aed">725,510</td>
+        </tr><tr data-search="concepts and tools in molecular spintronics fetopen-01-2016-2017 h2020_projects_trimmed">
+          <td>Concepts and tools in molecular spintronics</td>
+          <td><span class="chip chip-topic">FETOPEN-01-2016-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="704966.25" style="text-align:right">704,966</td>
+          <td data-num="704966.25" style="text-align:right;font-weight:700;color:#7c3aed">704,966</td>
+        </tr><tr data-search="scintillating porous architectures for radioactive gas detection fetopen-01-2018-2019-2020 h2020_projects_trimmed">
+          <td>Scintillating Porous Architectures for RadioacTivE gas detection</td>
+          <td><span class="chip chip-topic">FETOPEN-01-2018-2019-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="699876.25" style="text-align:right">699,876</td>
+          <td data-num="699876.25" style="text-align:right;font-weight:700;color:#7c3aed">699,876</td>
+        </tr><tr data-search="research infrastructures services reinforcing air quality monitoring capacities in european urban &amp; industrial areas    (ri-urbans) lc-gd-9-1-2020 h2020_projects_trimmed">
+          <td>Research Infrastructures Services Reinforcing Air Quality Monitoring Capacities in European Urban &amp; Industrial AreaS    (RI-URBANS)</td>
+          <td><span class="chip chip-topic">LC-GD-9-1-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="699000.0" style="text-align:right">699,000</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="699000.0" style="text-align:right;font-weight:700;color:#7c3aed">699,000</td>
+        </tr><tr data-search="european research area for climate services sc5-02-2015 h2020_projects_trimmed">
+          <td>European Research Area for Climate Services</td>
+          <td><span class="chip chip-topic">SC5-02-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="550848.21" style="text-align:right">550,848</td>
+          <td data-num="144660.45" style="text-align:right">144,660</td>
+          <td data-num="695508.6599999999" style="text-align:right;font-weight:700;color:#7c3aed">695,509</td>
+        </tr><tr data-search="research and development with ion beams – advancing technology in europe infraia-01-2018-2019 h2020_projects_trimmed">
+          <td>Research And Development with Ion Beams – Advancing Technology in Europe</td>
+          <td><span class="chip chip-topic">INFRAIA-01-2018-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="693835.55" style="text-align:right">693,836</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="693835.55" style="text-align:right;font-weight:700;color:#7c3aed">693,836</td>
+        </tr><tr data-search="advanced laser ablation barrier films for organic and large area electronic devices ict-03-2014 h2020_projects_trimmed">
+          <td>Advanced laser ablation barrier films for organic and large area electronic devices</td>
+          <td><span class="chip chip-topic">ICT-03-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="387020.0" style="text-align:right">387,020</td>
+          <td data-num="302074.0" style="text-align:right">302,074</td>
+          <td data-num="689094.0" style="text-align:right;font-weight:700;color:#7c3aed">689,094</td>
+        </tr><tr data-search="nanoscience foundries and fine analysis - europe|pilot infraia-03-2020 h2020_projects_trimmed">
+          <td>Nanoscience Foundries and Fine Analysis - Europe|PILOT</td>
+          <td><span class="chip chip-topic">INFRAIA-03-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="474485.99" style="text-align:right">474,486</td>
+          <td data-num="212026.68" style="text-align:right">212,027</td>
+          <td data-num="686512.6699999999" style="text-align:right;font-weight:700;color:#7c3aed">686,513</td>
+        </tr><tr data-search="quality assurance concepts for adhesive bonding of aircraft composite structures by advanced ndt mg-1.1-2014 h2020_projects_trimmed">
+          <td>Quality assurance concepts for adhesive bonding of aircraft composite structures by advanced NDT</td>
+          <td><span class="chip chip-topic">MG-1.1-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="344206.0" style="text-align:right">344,206</td>
+          <td data-num="339130.0" style="text-align:right">339,130</td>
+          <td data-num="683336.0" style="text-align:right;font-weight:700;color:#7c3aed">683,336</td>
+        </tr><tr data-search="model-based framework for dependable sensing and actuation in intelligent decentralized iot systems iot-03-2017 h2020_projects_trimmed">
+          <td>model-Based fRamework for dependable sensing and Actuation in INtelligent decentralized IoT systems</td>
+          <td><span class="chip chip-topic">IoT-03-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="644242.75" style="text-align:right">644,243</td>
+          <td data-num="644242.75" style="text-align:right;font-weight:700;color:#7c3aed">644,243</td>
+        </tr><tr data-search="nan nan nan">
+          <td>nan</td>
+          <td><span class="chip chip-topic">nan</span></td>
+          <td><span class="chip chip-prog">nan</span></td>
+          <td data-num="190000.0" style="text-align:right">190,000</td>
+          <td data-num="440000.0" style="text-align:right">440,000</td>
+          <td data-num="630000.0" style="text-align:right;font-weight:700;color:#7c3aed">630,000</td>
+        </tr><tr data-search="magnetically actuated bio-inspired metamaterials fetopen-ria-2014-2015 h2020_projects_trimmed">
+          <td>Magnetically actuated bio-inspired metamaterials</td>
+          <td><span class="chip chip-topic">FETOPEN-RIA-2014-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="603128.75" style="text-align:right">603,129</td>
+          <td data-num="603128.75" style="text-align:right;font-weight:700;color:#7c3aed">603,129</td>
+        </tr><tr data-search="strategies of circular economy and advanced bio-based solutions to keep our lands and seas alive from plastics contamination ce-bg-06-2019 h2020_projects_trimmed">
+          <td>Strategies of circular Economy and Advanced bio-based solutions to keep our Lands and seas alIVE from plastics contamination</td>
+          <td><span class="chip chip-topic">CE-BG-06-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="599999.48" style="text-align:right">599,999</td>
+          <td data-num="599999.48" style="text-align:right;font-weight:700;color:#7c3aed">599,999</td>
+        </tr><tr data-search="the european open science cloud for research pilot project. infradev-04-2016 h2020_projects_trimmed">
+          <td>The European Open Science Cloud for Research Pilot Project.</td>
+          <td><span class="chip chip-topic">INFRADEV-04-2016</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="481850.0" style="text-align:right">481,850</td>
+          <td data-num="105625.0" style="text-align:right">105,625</td>
+          <td data-num="587475.0" style="text-align:right;font-weight:700;color:#7c3aed">587,475</td>
+        </tr><tr data-search="further understanding related to transport limitations at high current density towards future electrodes for fuel cells fch-01-4-2019 h2020_projects_trimmed">
+          <td>Further Understanding Related to Transport limitations at High current density towards future ElectRodes for Fuel Cells</td>
+          <td><span class="chip chip-topic">FCH-01-4-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="572668.61" style="text-align:right">572,669</td>
+          <td data-num="572668.61" style="text-align:right;font-weight:700;color:#7c3aed">572,669</td>
+        </tr><tr data-search="combining approaches for photosynthetic improvement to allow increased sustainability in european agriculture biotec-02-2019 h2020_projects_trimmed">
+          <td>COMBINING APPROACHES FOR PHOTOSYNTHETIC IMPROVEMENT TO ALLOW INCREASED SUSTAINABILITY IN EUROPEAN AGRICULTURE</td>
+          <td><span class="chip chip-topic">BIOTEC-02-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="552497.04" style="text-align:right">552,497</td>
+          <td data-num="552497.04" style="text-align:right;font-weight:700;color:#7c3aed">552,497</td>
+        </tr><tr data-search="excellence in simulation of weather and climate in europe, phase 2 infraedi-02-2018 h2020_projects_trimmed">
+          <td>Excellence in Simulation of Weather and Climate in Europe, Phase 2</td>
+          <td><span class="chip chip-topic">INFRAEDI-02-2018</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="548812.5" style="text-align:right">548,812</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="548812.5" style="text-align:right;font-weight:700;color:#7c3aed">548,812</td>
+        </tr><tr data-search="generation iv materials maturity nfrp-5 h2020_projects_trimmed">
+          <td>GEneration iv Materials MAturity</td>
+          <td><span class="chip chip-topic">NFRP-5</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="309861.0" style="text-align:right">309,861</td>
+          <td data-num="236500.0" style="text-align:right">236,500</td>
+          <td data-num="546361.0" style="text-align:right;font-weight:700;color:#7c3aed">546,361</td>
+        </tr><tr data-search="european tools and methodologies for an efficient ageing management of nuclear power plant cables nfrp-1 h2020_projects_trimmed">
+          <td>European Tools and Methodologies for an efficient ageing management of nuclear power plant Cables</td>
+          <td><span class="chip chip-topic">NFRP-1</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="527215.0" style="text-align:right">527,215</td>
+          <td data-num="527215.0" style="text-align:right;font-weight:700;color:#7c3aed">527,215</td>
+        </tr><tr data-search="quantum-enhanced sensing via quantum control msca-itn-2017 h2020_projects_trimmed">
+          <td>Quantum-enhanced Sensing via Quantum Control</td>
+          <td><span class="chip chip-topic">MSCA-ITN-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="262875.6" style="text-align:right">262,876</td>
+          <td data-num="262875.6" style="text-align:right">262,876</td>
+          <td data-num="525751.2" style="text-align:right;font-weight:700;color:#7c3aed">525,751</td>
+        </tr><tr data-search="novel ceramic matrix composites produced with microwave assisted chemical vapour infiltration process for energy-intensive industries lc-spire-08-2020 h2020_projects_trimmed">
+          <td>Novel Ceramic Matrix Composites produced with Microwave assisted Chemical Vapour Infiltration process for energy-intensive industries</td>
+          <td><span class="chip chip-topic">LC-SPIRE-08-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="519995.0" style="text-align:right">519,995</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="519995.0" style="text-align:right;font-weight:700;color:#7c3aed">519,995</td>
+        </tr><tr data-search="tools for early and effective reconnaissance in cbrne incidents providing first responders faster information and enabling better management of the control zone sec-05-drs-2016-2017 h2020_projects_trimmed">
+          <td>Tools for early and Effective Reconnaissance in cbRne Incidents providing First responders Faster Information and enabling better management of the Control zone</td>
+          <td><span class="chip chip-topic">SEC-05-DRS-2016-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="501842.5" style="text-align:right">501,842</td>
+          <td data-num="501842.5" style="text-align:right;font-weight:700;color:#7c3aed">501,842</td>
+        </tr><tr data-search="the european network for observing our changing planet sc5-15-2015 h2020_projects_trimmed">
+          <td>The European network for observing our changing planet</td>
+          <td><span class="chip chip-topic">SC5-15-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="499600.0" style="text-align:right">499,600</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="499600.0" style="text-align:right;font-weight:700;color:#7c3aed">499,600</td>
+        </tr><tr data-search="innovative eco-efficient processing and refining routes for secondary raw materials from silicon ingot and wafer manufacturing for accelerated utilisation in high-end markets ce-sc5-07-2020 h2020_projects_trimmed">
+          <td>Innovative eco-efficient processing and refining routes for secondary raw materials from silicon ingot and wafer manufacturing for accelerated utilisation in high-end markets</td>
+          <td><span class="chip chip-topic">CE-SC5-07-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="499385.0" style="text-align:right">499,385</td>
+          <td data-num="499385.0" style="text-align:right;font-weight:700;color:#7c3aed">499,385</td>
+        </tr><tr data-search="future circular collider innovation study infradev-01-2019-2020 h2020_projects_trimmed">
+          <td>Future Circular Collider Innovation Study</td>
+          <td><span class="chip chip-topic">INFRADEV-01-2019-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="302265.0" style="text-align:right">302,265</td>
+          <td data-num="188910.0" style="text-align:right">188,910</td>
+          <td data-num="491175.0" style="text-align:right;font-weight:700;color:#7c3aed">491,175</td>
+        </tr><tr data-search="a european ai on demand platform and ecosystem ict-26-2018-2020 h2020_projects_trimmed">
+          <td>A European AI On Demand Platform and Ecosystem</td>
+          <td><span class="chip chip-topic">ICT-26-2018-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="100031.25" style="text-align:right">100,031</td>
+          <td data-num="377936.25" style="text-align:right">377,936</td>
+          <td data-num="477967.5" style="text-align:right;font-weight:700;color:#7c3aed">477,968</td>
+        </tr><tr data-search="excellence in simulation of weather and climate in europe einfra-5-2015 h2020_projects_trimmed">
+          <td>Excellence in SImulation of Weather and Climate in Europe</td>
+          <td><span class="chip chip-topic">EINFRA-5-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="475788.75" style="text-align:right">475,789</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="475788.75" style="text-align:right;font-weight:700;color:#7c3aed">475,789</td>
+        </tr><tr data-search="climate-carbon interactions in the current century lc-cla-08-2018 h2020_projects_trimmed">
+          <td>Climate-Carbon Interactions in the Current Century</td>
+          <td><span class="chip chip-topic">LC-CLA-08-2018</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="472207.5" style="text-align:right">472,208</td>
+          <td data-num="472207.5" style="text-align:right;font-weight:700;color:#7c3aed">472,208</td>
+        </tr><tr data-search="development and implementation of grouping and safe-by-design approaches within regulatory frameworks nmp-26-2014 h2020_projects_trimmed">
+          <td>Development and implementation of Grouping and Safe-by-Design approaches within regulatory frameworks</td>
+          <td><span class="chip chip-topic">NMP-26-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="200000.0" style="text-align:right">200,000</td>
+          <td data-num="250515.0" style="text-align:right">250,515</td>
+          <td data-num="450515.0" style="text-align:right;font-weight:700;color:#7c3aed">450,515</td>
+        </tr><tr data-search="cryogenic 3d nanoelectronics ict-06-2019 h2020_projects_trimmed">
+          <td>Cryogenic 3D Nanoelectronics</td>
+          <td><span class="chip chip-topic">ICT-06-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="446857.0" style="text-align:right">446,857</td>
+          <td data-num="446857.0" style="text-align:right;font-weight:700;color:#7c3aed">446,857</td>
+        </tr><tr data-search="integrated activities for the high energy astrophysics domain infraia-1-2014-2015 h2020_projects_trimmed">
+          <td>Integrated Activities for the High Energy Astrophysics Domain</td>
+          <td><span class="chip chip-topic">INFRAIA-1-2014-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="240381.0" style="text-align:right">240,381</td>
+          <td data-num="147715.0" style="text-align:right">147,715</td>
+          <td data-num="388096.0" style="text-align:right;font-weight:700;color:#7c3aed">388,096</td>
+        </tr><tr data-search="high performance computer and quantum simulator hybrid eurohpc-2020-01-b h2020_projects_trimmed">
+          <td>High Performance Computer and Quantum Simulator hybrid</td>
+          <td><span class="chip chip-topic">EuroHPC-2020-01-b</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="117432.5" style="text-align:right">117,432</td>
+          <td data-num="257086.23" style="text-align:right">257,086</td>
+          <td data-num="374518.73" style="text-align:right;font-weight:700;color:#7c3aed">374,519</td>
+        </tr><tr data-search="foundations of trustworthy ai - integrating reasoning, learning and optimization ict-48-2020 h2020_projects_trimmed">
+          <td>Foundations of Trustworthy AI - Integrating Reasoning, Learning and Optimization</td>
+          <td><span class="chip chip-topic">ICT-48-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="261437.5" style="text-align:right">261,438</td>
+          <td data-num="111925.0" style="text-align:right">111,925</td>
+          <td data-num="373362.5" style="text-align:right;font-weight:700;color:#7c3aed">373,362</td>
+        </tr><tr data-search="nan nan nan">
+          <td>nan</td>
+          <td><span class="chip chip-topic">nan</span></td>
+          <td><span class="chip chip-prog">nan</span></td>
+          <td data-num="87923.87" style="text-align:right">87,924</td>
+          <td data-num="283986.68" style="text-align:right">283,987</td>
+          <td data-num="371910.55" style="text-align:right;font-weight:700;color:#7c3aed">371,911</td>
+        </tr><tr data-search="infrastructure for transnational access and discovery in structural biology infraia-01-2018-2019 h2020_projects_trimmed">
+          <td>Infrastructure for transnational access and discovery in structural biology</td>
+          <td><span class="chip chip-topic">INFRAIA-01-2018-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="371254.92" style="text-align:right">371,255</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="371254.92" style="text-align:right;font-weight:700;color:#7c3aed">371,255</td>
+        </tr><tr data-search="innovative cladding materials for advanced accident-tolerant energy systems nfrp-1 h2020_projects_trimmed">
+          <td>Innovative cladding materials for advanced accident-tolerant energy systems</td>
+          <td><span class="chip chip-topic">NFRP-1</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="360041.25" style="text-align:right">360,041</td>
+          <td data-num="360041.25" style="text-align:right;font-weight:700;color:#7c3aed">360,041</td>
+        </tr><tr data-search="monitoring atmospheric composition and climate -iii space h2020_projects_trimmed">
+          <td>Monitoring Atmospheric Composition and Climate -III</td>
+          <td><span class="chip chip-topic">SPACE</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="258316.0" style="text-align:right">258,316</td>
+          <td data-num="85000.0" style="text-align:right">85,000</td>
+          <td data-num="343316.0" style="text-align:right;font-weight:700;color:#7c3aed">343,316</td>
+        </tr><tr data-search="japan and europe network for neutrino and intensity frontier experimental research 2 msca-rise-2018 h2020_projects_trimmed">
+          <td>Japan and Europe Network for Neutrino and Intensity Frontier Experimental Research 2</td>
+          <td><span class="chip chip-topic">MSCA-RISE-2018</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="184000.0" style="text-align:right">184,000</td>
+          <td data-num="96600.0" style="text-align:right">96,600</td>
+          <td data-num="280600.0" style="text-align:right;font-weight:700;color:#7c3aed">280,600</td>
+        </tr><tr data-search="dres2market: technical, business and regulatory approaches to enhance the renewable energy capabilities to take part actively in the electricity and ancillary services markets lc-sc3-res-28-2018-2019-2020 h2020_projects_trimmed">
+          <td>DRES2Market: Technical, business and regulatory approaches to enhance the renewable energy capabilities to take part actively in the electricity and ancillary services markets</td>
+          <td><span class="chip chip-topic">LC-SC3-RES-28-2018-2019-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="278707.5" style="text-align:right">278,708</td>
+          <td data-num="278707.5" style="text-align:right;font-weight:700;color:#7c3aed">278,708</td>
+        </tr><tr data-search="artificial intelligence for digitizing industry ecsel-2018-2-ria-special-topic h2020_projects_trimmed">
+          <td>Artificial Intelligence for Digitizing Industry</td>
+          <td><span class="chip chip-topic">ECSEL-2018-2-RIA-Special-Topic</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="271602.63" style="text-align:right">271,603</td>
+          <td data-num="271602.63" style="text-align:right;font-weight:700;color:#7c3aed">271,603</td>
+        </tr><tr data-search="probes of new physics and technological advancements from particle and gravitational wave physics experiments. a cooperative europe - united states - asia effort. msca-rise-2020 h2020_projects_trimmed">
+          <td>Probes of new physics and technological advancements from particle and gravitational wave physics experiments. A cooperative Europe - United States - Asia effort.</td>
+          <td><span class="chip chip-topic">MSCA-RISE-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="211600.0" style="text-align:right">211,600</td>
+          <td data-num="55200.0" style="text-align:right">55,200</td>
+          <td data-num="266800.0" style="text-align:right;font-weight:700;color:#7c3aed">266,800</td>
+        </tr><tr data-search="the virtual centre for integration of innovative synthesis and processing methods for sustainable advanced materials operating under extreme conditions h2020-twinn-2015 h2020_projects_trimmed">
+          <td>The VIRTUAL Centre for Integration of INNOVATIVE synthesis and Processing methods for SUSTAINABLE advanced Materials operating under Extreme Conditions</td>
+          <td><span class="chip chip-topic">H2020-TWINN-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="128125.0" style="text-align:right">128,125</td>
+          <td data-num="131250.0" style="text-align:right">131,250</td>
+          <td data-num="259375.0" style="text-align:right;font-weight:700;color:#7c3aed">259,375</td>
+        </tr><tr data-search="integrating distributed data infrastructures for global exploitation einfra-1-2014 h2020_projects_trimmed">
+          <td>INtegrating Distributed data Infrastructures for Global ExplOitation</td>
+          <td><span class="chip chip-topic">EINFRA-1-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="157500.0" style="text-align:right">157,500</td>
+          <td data-num="99625.0" style="text-align:right">99,625</td>
+          <td data-num="257125.0" style="text-align:right;font-weight:700;color:#7c3aed">257,125</td>
+        </tr><tr data-search="towards effective radiation protection based on improved scientific evidence and social considerations  - focus on radon and norm nfrp-2019-2020-12 h2020_projects_trimmed">
+          <td>Towards effective radiation protection based on improved scientific evidence and social considerations  - focus on radon and NORM</td>
+          <td><span class="chip chip-topic">NFRP-2019-2020-12</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="167812.0" style="text-align:right">167,812</td>
+          <td data-num="74097.0" style="text-align:right">74,097</td>
+          <td data-num="241909.0" style="text-align:right;font-weight:700;color:#7c3aed">241,909</td>
+        </tr><tr data-search="europe-japan accelerator development exchange programme msca-rise-2014 h2020_projects_trimmed">
+          <td>Europe-Japan Accelerator Development Exchange Programme</td>
+          <td><span class="chip chip-topic">MSCA-RISE-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="180000.0" style="text-align:right">180,000</td>
+          <td data-num="40500.0" style="text-align:right">40,500</td>
+          <td data-num="220500.0" style="text-align:right;font-weight:700;color:#7c3aed">220,500</td>
+        </tr><tr data-search="integrating national research agendas on solar heat for industrial processes lce-33-2016 h2020_projects_trimmed">
+          <td>Integrating National Research Agendas on Solar Heat for Industrial Processes</td>
+          <td><span class="chip chip-topic">LCE-33-2016</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="10000.0" style="text-align:right">10,000</td>
+          <td data-num="199261.25" style="text-align:right">199,261</td>
+          <td data-num="209261.25" style="text-align:right;font-weight:700;color:#7c3aed">209,261</td>
+        </tr><tr data-search="japan and europe network for neutrino and intensity frontier experimental research msca-rise-2014 h2020_projects_trimmed">
+          <td>Japan and Europe Network for Neutrino and Intensity Frontier Experimental Research</td>
+          <td><span class="chip chip-topic">MSCA-RISE-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="76500.0" style="text-align:right">76,500</td>
+          <td data-num="126000.0" style="text-align:right">126,000</td>
+          <td data-num="202500.0" style="text-align:right;font-weight:700;color:#7c3aed">202,500</td>
+        </tr><tr data-search="infrastructure for nmr, em and x-rays for translational research infraia-1-2014-2015 h2020_projects_trimmed">
+          <td>Infrastructure for NMR, EM and X-rays for translational research</td>
+          <td><span class="chip chip-topic">INFRAIA-1-2014-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="179625.0" style="text-align:right">179,625</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="179625.0" style="text-align:right;font-weight:700;color:#7c3aed">179,625</td>
+        </tr><tr data-search="boosting the scientific excellence and innovation capacity in organic electronics of the silesian university of technology h2020-twinn-2015 h2020_projects_trimmed">
+          <td>Boosting the scientific excellence and innovation capacity in organic electronics of the Silesian University of Technology</td>
+          <td><span class="chip chip-topic">H2020-TWINN-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="162687.5" style="text-align:right">162,688</td>
+          <td data-num="162687.5" style="text-align:right;font-weight:700;color:#7c3aed">162,688</td>
+        </tr><tr data-search="advanced structural integrity assessment tools for safe long term operation nfrp-1 h2020_projects_trimmed">
+          <td>Advanced Structural Integrity Assessment Tools for Safe Long Term Operation</td>
+          <td><span class="chip chip-topic">NFRP-1</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="155875.0" style="text-align:right">155,875</td>
+          <td data-num="155875.0" style="text-align:right;font-weight:700;color:#7c3aed">155,875</td>
+        </tr><tr data-search="prototype demonstration using low-cost catalysts for electrolysis to h2 erc-2018-poc h2020_projects_trimmed">
+          <td>PROtotype Demonstration Using low-cost Catalysts for Electrolysis to H2</td>
+          <td><span class="chip chip-topic">ERC-2018-PoC</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="150000.0" style="text-align:right">150,000</td>
+          <td data-num="150000.0" style="text-align:right;font-weight:700;color:#7c3aed">150,000</td>
+        </tr><tr data-search="battery 2030+ large-scale research initiative: at the heart of a connected green society lc-bat-15-2020 h2020_projects_trimmed">
+          <td>BATTERY 2030+ large-scale research initiative: At the heart of a connected green society</td>
+          <td><span class="chip chip-topic">LC-BAT-15-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="49491.25" style="text-align:right">49,491</td>
+          <td data-num="88008.75" style="text-align:right">88,009</td>
+          <td data-num="137500.0" style="text-align:right;font-weight:700;color:#7c3aed">137,500</td>
+        </tr><tr data-search="multi-stakeholder platform for a secure supply of refractory metals in europe waste-4d-2015 h2020_projects_trimmed">
+          <td>Multi-Stakeholder Platform for a Secure Supply of Refractory Metals in Europe</td>
+          <td><span class="chip chip-topic">WASTE-4d-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="130250.0" style="text-align:right">130,250</td>
+          <td data-num="130250.0" style="text-align:right;font-weight:700;color:#7c3aed">130,250</td>
+        </tr><tr data-search="accelerator and research reactor infrastructures for education and learning nfrp-2018-7 h2020_projects_trimmed">
+          <td>Accelerator and Research reactor Infrastructures for Education and Learning</td>
+          <td><span class="chip chip-topic">NFRP-2018-7</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="85468.75" style="text-align:right">85,469</td>
+          <td data-num="40173.0" style="text-align:right">40,173</td>
+          <td data-num="125641.75" style="text-align:right;font-weight:700;color:#7c3aed">125,642</td>
+        </tr><tr data-search="industrial biotechnology innovation and synthetic biology accelerator preparatory phase infradev-02-2019-2020 h2020_projects_trimmed">
+          <td>Industrial Biotechnology Innovation and Synthetic Biology Accelerator Preparatory Phase</td>
+          <td><span class="chip chip-topic">INFRADEV-02-2019-2020</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="121500.0" style="text-align:right">121,500</td>
+          <td data-num="121500.0" style="text-align:right;font-weight:700;color:#7c3aed">121,500</td>
+        </tr><tr data-search="future superconducting magnet technology fetopen-03-2017 h2020_projects_trimmed">
+          <td>Future Superconducting Magnet Technology</td>
+          <td><span class="chip chip-topic">FETOPEN-03-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="22518.75" style="text-align:right">22,519</td>
+          <td data-num="95375.0" style="text-align:right">95,375</td>
+          <td data-num="117893.75" style="text-align:right;font-weight:700;color:#7c3aed">117,894</td>
+        </tr><tr data-search="industrial biotechnology innovation and synthetic biology accelerator infraia-02-2017 h2020_projects_trimmed">
+          <td>Industrial Biotechnology Innovation and Synthetic Biology Accelerator</td>
+          <td><span class="chip chip-topic">INFRAIA-02-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="105170.54" style="text-align:right">105,171</td>
+          <td data-num="105170.54" style="text-align:right;font-weight:700;color:#7c3aed">105,171</td>
+        </tr><tr data-search="nanoelectronics roadmap for europe: identification and dissemination ict-25-2015 h2020_projects_trimmed">
+          <td>NanoElectronics Roadmap for Europe: Identification and Dissemination</td>
+          <td><span class="chip chip-topic">ICT-25-2015</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="79000.0" style="text-align:right">79,000</td>
+          <td data-num="79000.0" style="text-align:right;font-weight:700;color:#7c3aed">79,000</td>
+        </tr><tr data-search="battery 2030+ at the heart of a connected green society fetproact-04-2019 h2020_projects_trimmed">
+          <td>BATTERY 2030+ At the heart of a connected green society</td>
+          <td><span class="chip chip-topic">FETPROACT-04-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="25000.0" style="text-align:right">25,000</td>
+          <td data-num="25998.75" style="text-align:right">25,999</td>
+          <td data-num="50998.75" style="text-align:right;font-weight:700;color:#7c3aed">50,999</td>
+        </tr><tr data-search="graphene flagship 2d experimental pilot line sga-fet-graphene-2-2019 h2020_projects_trimmed">
+          <td>Graphene Flagship 2D Experimental Pilot Line</td>
+          <td><span class="chip chip-topic">SGA-FET-GRAPHENE-2-2019</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right;font-weight:700;color:#7c3aed">0</td>
+        </tr><tr data-search="nan nan nan">
+          <td>nan</td>
+          <td><span class="chip chip-topic">nan</span></td>
+          <td><span class="chip chip-prog">nan</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right;font-weight:700;color:#7c3aed">0</td>
+        </tr><tr data-search="“interdisciplinary nanoscience school: from phenomenology to applications” msca-cofund-2015-dp h2020_projects_trimmed">
+          <td>“Interdisciplinary NAnoscience School: from phenoMEnology to applicationS”</td>
+          <td><span class="chip chip-topic">MSCA-COFUND-2015-DP</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right;font-weight:700;color:#7c3aed">0</td>
+        </tr><tr data-search="european human biomonitoring initiative sc1-pm-05-2016 h2020_projects_trimmed">
+          <td>European Human Biomonitoring Initiative</td>
+          <td><span class="chip chip-topic">SC1-PM-05-2016</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right;font-weight:700;color:#7c3aed">0</td>
+        </tr><tr data-search="prace 4th implementation phase project einfra-4-2014 h2020_projects_trimmed">
+          <td>PRACE 4th Implementation Phase Project</td>
+          <td><span class="chip chip-topic">EINFRA-4-2014</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right;font-weight:700;color:#7c3aed">0</td>
+        </tr><tr data-search="prace 5th implementation phase project einfra-11-2016 h2020_projects_trimmed">
+          <td>PRACE 5th Implementation Phase Project</td>
+          <td><span class="chip chip-topic">EINFRA-11-2016</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right;font-weight:700;color:#7c3aed">0</td>
+        </tr><tr data-search="prace 6th implementation phase project infraedi-01-2018 h2020_projects_trimmed">
+          <td>PRACE 6th Implementation Phase Project</td>
+          <td><span class="chip chip-topic">INFRAEDI-01-2018</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right;font-weight:700;color:#7c3aed">0</td>
+        </tr><tr data-search="european extreme data and computing initiative - 2 fethpc-03-2017 h2020_projects_trimmed">
+          <td>European eXtreme Data and Computing Initiative - 2</td>
+          <td><span class="chip chip-topic">FETHPC-03-2017</span></td>
+          <td><span class="chip chip-prog">h2020_projects_trimmed</span></td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right">0</td>
+          <td data-num="0.0" style="text-align:right;font-weight:700;color:#7c3aed">0</td>
+        </tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    const NET_NODES = [{"id": "ORG_A", "label": "CENTRE NATIONAL DE LA RECHERCHE SCIENT", "title": "<b>CENTRE NATIONAL DE LA RECHERCHE SCIENTIFIQUE CNRS</b><br/>FR · PARIS<br/>Budget total: 1,190,720,080 €<br/>Projets totaux: 1868", "color": {"background": "#2563eb", "border": "#1e3a8a", "highlight": {"background": "#1d4ed8", "border": "#1e3a8a"}}, "size": 70, "shape": "dot", "font": {"size": 18, "color": "#1e3a8a", "face": "Inter"}, "borderWidth": 4, "fixed": {"x": true, "y": false}, "x": -550, "y": 0}, {"id": "ORG_B", "label": "COMMISSARIAT A L ENERGIE ATOMIQUE ET A", "title": "<b>COMMISSARIAT A L ENERGIE ATOMIQUE ET AUX ENERGIES ALTERNATIVES</b><br/>FR · Paris<br/>Budget total: 707,824,575 €<br/>Projets totaux: 780", "color": {"background": "#dc2626", "border": "#7f1d1d", "highlight": {"background": "#b91c1c", "border": "#7f1d1d"}}, "size": 70, "shape": "dot", "font": {"size": 18, "color": "#7f1d1d", "face": "Inter"}, "borderWidth": 4, "fixed": {"x": true, "y": false}, "x": 550, "y": 0}, {"id": "P_0", "label": "Implementation of activities des...", "title": "<b>Implementation of activities described in the Roadmap to Fusion during Horizon 2020 through a Joint programme of the members of the EUROfusion consortium</b><br/>Sujet: EURATOM<br/>Programme: h2020_projects_trimmed<br/>Financement A: 0 €<br/>Financement B: 70,929,421 €<br/><b>Total A+B: 70,929,421 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 50.0, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -62.0}, "borderWidth": 2}, {"id": "P_1", "label": "Which Architecture Yields Two Ot...", "title": "<b>Which Architecture Yields Two Other Generations Of Fully depleted Advanced Substrate and Technologies</b><br/>Sujet: ECSEL-02-2014<br/>Programme: h2020_projects_trimmed<br/>Financement A: 594,996 €<br/>Financement B: 13,831,514 €<br/><b>Total A+B: 14,426,510 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 21.322128776263988, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -33.32212877626399}, "borderWidth": 2}, {"id": "P_2", "label": "3D integration technology for si...", "title": "<b>3D integration technology for silicon spin qubits</b><br/>Sujet: ERC-2018-SyG<br/>Programme: h2020_projects_trimmed<br/>Financement A: 3,010,144 €<br/>Financement B: 10,980,316 €<br/><b>Total A+B: 13,990,460 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 21.10081312350482, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -33.10081312350482}, "borderWidth": 2}, {"id": "P_3", "label": "Wafers for Automotive and other ...", "title": "<b>Wafers for Automotive and other Key applications using Memories, embedded in Ulsi Processors</b><br/>Sujet: ECSEL-2017-1<br/>Programme: h2020_projects_trimmed<br/>Financement A: 654,874 €<br/>Financement B: 9,268,019 €<br/><b>Total A+B: 9,922,893 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 19.036332689474555, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -31.036332689474555}, "borderWidth": 2}, {"id": "P_4", "label": "Human Brain Project Specific Gra...", "title": "<b>Human Brain Project Specific Grant Agreement 3</b><br/>Sujet: SGA-FETFLAG-HBP-2019<br/>Programme: h2020_projects_trimmed<br/>Financement A: 6,013,461 €<br/>Financement B: 3,538,462 €<br/><b>Total A+B: 9,551,923 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 18.848047826804386, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -30.848047826804386}, "borderWidth": 2}, {"id": "P_5", "label": "Atmospheric WAter Cycle over Ant...", "title": "<b>Atmospheric WAter Cycle over Antarctica: Past, Present and Future</b><br/>Sujet: ERC-2020-SyG<br/>Programme: h2020_projects_trimmed<br/>Financement A: 5,570,555 €<br/>Financement B: 2,968,618 €<br/><b>Total A+B: 8,539,172 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 18.334029628180307, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -30.334029628180307}, "borderWidth": 2}, {"id": "P_6", "label": "Energy for Smart Objects", "title": "<b>Energy for Smart Objects</b><br/>Sujet: ECSEL-18-2015<br/>Programme: h2020_projects_trimmed<br/>Financement A: 0 €<br/>Financement B: 7,638,913 €<br/><b>Total A+B: 7,638,913 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 17.877106007953763, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -29.877106007953763}, "borderWidth": 2}, {"id": "P_7", "label": "Energy for Smart Objects", "title": "<b>Energy for Smart Objects</b><br/>Sujet: ECSEL-18-2015<br/>Programme: h2020_projects_trimmed<br/>Financement A: 0 €<br/>Financement B: 7,638,913 €<br/><b>Total A+B: 7,638,913 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 17.877106007953763, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -29.877106007953763}, "borderWidth": 2}, {"id": "P_8", "label": "Graphene Flagship Core Project 3", "title": "<b>Graphene Flagship Core Project 3</b><br/>Sujet: SGA-FET-GRAPHENE-2019<br/>Programme: h2020_projects_trimmed<br/>Financement A: 4,431,573 €<br/>Financement B: 2,118,208 €<br/><b>Total A+B: 6,549,781 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 17.324320476673805, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -29.324320476673805}, "borderWidth": 2}, {"id": "P_9", "label": "Graphene-based disruptive techno...", "title": "<b>Graphene-based disruptive technologies</b><br/>Sujet: FETFLAGSHIP<br/>Programme: h2020_projects_trimmed<br/>Financement A: 3,902,402 €<br/>Financement B: 2,083,913 €<br/><b>Total A+B: 5,986,315 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 17.038334881216414, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -29.038334881216414}, "borderWidth": 2}, {"id": "P_10", "label": "Interactive Computing E-Infrastr...", "title": "<b>Interactive Computing E-Infrastructure for the Human Brain Project</b><br/>Sujet: SGA-INFRA-FETFLAG-HBP<br/>Programme: h2020_projects_trimmed<br/>Financement A: 0 €<br/>Financement B: 5,316,680 €<br/><b>Total A+B: 5,316,680 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 16.698463687194728, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -28.698463687194728}, "borderWidth": 2}, {"id": "P_11", "label": "Human Brain Project Specific Gra...", "title": "<b>Human Brain Project Specific Grant Agreement 2</b><br/>Sujet: SGA-FETFLAG-HBP-2017<br/>Programme: h2020_projects_trimmed<br/>Financement A: 3,543,057 €<br/>Financement B: 1,699,791 €<br/><b>Total A+B: 5,242,848 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 16.660990624241602, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -28.660990624241602}, "borderWidth": 2}, {"id": "P_12", "label": "Graphene Flagship Core Project 2", "title": "<b>Graphene Flagship Core Project 2</b><br/>Sujet: SGA-FET-GRAPHENE-2017<br/>Programme: h2020_projects_trimmed<br/>Financement A: 3,192,568 €<br/>Financement B: 1,920,992 €<br/><b>Total A+B: 5,113,560 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 16.595371112245957, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -28.595371112245957}, "borderWidth": 2}, {"id": "P_13", "label": "Human Brain Project Specific Gra...", "title": "<b>Human Brain Project Specific Grant Agreement 1</b><br/>Sujet: FETFLAGSHIP<br/>Programme: h2020_projects_trimmed<br/>Financement A: 3,353,474 €<br/>Financement B: 1,697,128 €<br/><b>Total A+B: 5,050,602 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 16.56341672739827, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -28.56341672739827}, "borderWidth": 2}, {"id": "P_14", "label": "European Joint Programme on Radi...", "title": "<b>European Joint Programme on Radioactive Waste Management</b><br/>Sujet: NFRP-2018-6<br/>Programme: h2020_projects_trimmed<br/>Financement A: 3,075,696 €<br/>Financement B: 1,474,835 €<br/><b>Total A+B: 4,550,531 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 16.309607365492347, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -28.309607365492347}, "borderWidth": 2}, {"id": "P_15", "label": "Quantum Large Scale Integretion ...", "title": "<b>Quantum Large Scale Integretion in Silicon</b><br/>Sujet: FETFLAG-05-2020<br/>Programme: h2020_projects_trimmed<br/>Financement A: 1,304,260 €<br/>Financement B: 3,198,700 €<br/><b>Total A+B: 4,502,960 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 16.28546291277179, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -28.28546291277179}, "borderWidth": 2}, {"id": "P_16", "label": "Astronomy ESFRI and Research Inf...", "title": "<b>Astronomy ESFRI and Research Infrastructure Cluster</b><br/>Sujet: INFRADEV-4-2014-2015<br/>Programme: h2020_projects_trimmed<br/>Financement A: 3,936,450 €<br/>Financement B: 251,250 €<br/><b>Total A+B: 4,187,700 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 16.12545371040703, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -28.12545371040703}, "borderWidth": 2}, {"id": "P_17", "label": "Understanding our Galactic ecosy...", "title": "<b>Understanding our Galactic ecosystem: From the disk of the Milky Way to the formation sites of stars and planets</b><br/>Sujet: ERC-2019-SyG<br/>Programme: h2020_projects_trimmed<br/>Financement A: 362,500 €<br/>Financement B: 3,420,138 €<br/><b>Total A+B: 3,782,638 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 15.919865537048922, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -27.91986553704892}, "borderWidth": 2}, {"id": "P_18", "label": "tHErmaL vIsion AUgmented awarene...", "title": "<b>tHErmaL vIsion AUgmented awarenesS</b><br/>Sujet: ECSEL-2018-2-RIA<br/>Programme: h2020_projects_trimmed<br/>Financement A: 305,288 €<br/>Financement B: 3,182,833 €<br/><b>Total A+B: 3,488,121 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 15.770384854931898, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -27.770384854931898}, "borderWidth": 2}, {"id": "P_19", "label": "Solutions for Sustainable Access...", "title": "<b>Solutions for Sustainable Access to Atmospheric Research Facilities</b><br/>Sujet: INFRAIA-03-2020<br/>Programme: h2020_projects_trimmed<br/>Financement A: 3,487,519 €<br/>Financement B: 0 €<br/><b>Total A+B: 3,487,519 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 15.770078961554454, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -27.770078961554454}, "borderWidth": 2}, {"id": "P_20", "label": "Cyber Physical Systems for Europ...", "title": "<b>Cyber Physical Systems for Europe</b><br/>Sujet: ECSEL-2018-1-IA<br/>Programme: h2020_projects_trimmed<br/>Financement A: 91,224 €<br/>Financement B: 3,388,526 €<br/><b>Total A+B: 3,479,750 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 15.766135769604077, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -27.766135769604077}, "borderWidth": 2}, {"id": "P_21", "label": "European Exascale Processor  Mem...", "title": "<b>European Exascale Processor  Memory Node Design</b><br/>Sujet: FETHPC-1-2014<br/>Programme: h2020_projects_trimmed<br/>Financement A: 369,165 €<br/>Financement B: 3,041,945 €<br/><b>Total A+B: 3,411,110 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 15.731297945437, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -27.731297945437}, "borderWidth": 2}, {"id": "P_22", "label": "Na-Ion bAttery Demonstration for...", "title": "<b>Na-Ion bAttery Demonstration for Electric Storage</b><br/>Sujet: LCE-10-2014<br/>Programme: h2020_projects_trimmed<br/>Financement A: 946,901 €<br/>Financement B: 1,568,350 €<br/><b>Total A+B: 2,515,250 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 15.27660725703002, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -27.276607257030022}, "borderWidth": 2}, {"id": "P_23", "label": "CMOS/magnetoelectronic Integrate...", "title": "<b>CMOS/magnetoelectronic Integrated Circuits wil Multifunctional Capabilities</b><br/>Sujet: ERC-ADG-2014<br/>Programme: h2020_projects_trimmed<br/>Financement A: 0 €<br/>Financement B: 2,500,000 €<br/><b>Total A+B: 2,500,000 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 15.268866985700402, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -27.268866985700402}, "borderWidth": 2}, {"id": "P_24", "label": "nan", "title": "<b>nan</b><br/>Sujet: nan<br/>Programme: nan<br/>Financement A: 2,000,484 €<br/>Financement B: 494,625 €<br/><b>Total A+B: 2,495,110 €</b>", "color": {"background": "#a78bfa", "border": "#6d28d9", "highlight": {"background": "#7c3aed", "border": "#4c1d95"}}, "size": 15.266384828102975, "shape": "dot", "font": {"size": 11, "color": "#1f2937", "face": "Inter", "vadjust": -27.266384828102975}, "borderWidth": 2}];
+    const NET_EDGES = [{"from": "ORG_A", "to": "P_0", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.0, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_0", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 6.0, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_1", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.0419428211679886, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_1", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.975019508868676, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_2", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.212192890365967, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_2", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.774031154565258, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_3", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.0461638129348365, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_3", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.653326838381074, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_4", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.423904547419233, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_4", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.249435428525821, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_5", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.3926829628626836, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_5", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.2092655966068036, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_6", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.0, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_6", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.538486945549134, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_7", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.0, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_7", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.538486945549134, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_8", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.3123931485789604, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_8", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.1493180287368459, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_9", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.2750904823372848, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_9", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.1469004733872172, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_10", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.0, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_10", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.37478662322149, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_11", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.249759320922443, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_11", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.119822710222224, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_12", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.2250524871798363, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_12", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.1354157228543245, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_13", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.2363951182659958, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_13", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.1196349827615417, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_14", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.216813852269269, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_14", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.103964948493557, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_15", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.0919406919316448, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_15", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.225484712619993, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_16", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.2774906358811304, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_16", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.0177112683420682, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_17", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.0255535712397998, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_17", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.2410944200169949, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_18", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.0215205748055534, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_18", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.2243662106016548, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_19", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.2458443002158963, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_19", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.0, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_20", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.006430599555451, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_20", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.238866035111782, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_21", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.0260234044875605, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_21", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.2144346434898006, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_22", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.066749495709365, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_22", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.1105570677670267, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_23", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.0, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_23", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.1762315257917226, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "ORG_A", "to": "P_24", "color": {"color": "#93c5fd", "opacity": 0.7}, "width": 1.1410193743030765, "smooth": {"type": "curvedCW", "roundness": 0.05}}, {"from": "P_24", "to": "ORG_B", "color": {"color": "#fca5a5", "opacity": 0.7}, "width": 1.0348674073778923, "smooth": {"type": "curvedCW", "roundness": 0.05}}];
+    const PROG = {"labels": ["h2020_projects_trimmed", "Non spécifié"], "values": [187, 9]};
+    const TOPIC = {"labels": ["INFRAIA-01-2018-2019", "INFRAIA-1-2014-2015", "FETOPEN-01-2018-2019-2020", "ICT-25-2015", "FETOPEN-RIA-2014-2015", "INFRADEV-1-2014", "NFRP-1", "ECSEL-18-2015", "FETFLAGSHIP", "INFRADEV-4-2014-2015"], "values": [7, 6, 6, 5, 3, 3, 3, 2, 2, 2]};
+    const TOP_FUND = [{"label": "Implementation of activities d...", "a": 0.0, "b": 70929420.51}, {"label": "Which Architecture Yields Two ...", "a": 594996.0, "b": 13831513.75}, {"label": "3D integration technology for ...", "a": 3010143.75, "b": 10980316.25}, {"label": "Wafers for Automotive and othe...", "a": 654874.5, "b": 9268018.81}, {"label": "Human Brain Project Specific G...", "a": 6013460.78, "b": 3538462.08}, {"label": "Atmospheric WAter Cycle over A...", "a": 5570555.0, "b": 2968617.5}, {"label": "Energy for Smart Objects", "a": 0.0, "b": 7638913.4}, {"label": "Energy for Smart Objects", "a": 0.0, "b": 7638913.4}, {"label": "Graphene Flagship Core Project...", "a": 4431573.0, "b": 2118208.25}, {"label": "Graphene-based disruptive tech...", "a": 3902401.7, "b": 2083913.09}];
+
+    // ---- vis-network ----
+    (function() {
+      const container = document.getElementById('network');
+      const nodes = new vis.DataSet(NET_NODES);
+      const edges = new vis.DataSet(NET_EDGES);
+      const network = new vis.Network(container, { nodes, edges }, {
+        physics: {
+          enabled: true,
+          solver: 'forceAtlas2Based',
+          forceAtlas2Based: { gravitationalConstant: -120, centralGravity: 0.005, springLength: 220, springConstant: 0.02, damping: 0.6 },
+          stabilization: { iterations: 250 }
+        },
+        interaction: { hover: true, tooltipDelay: 120, navigationButtons: false, keyboard: false },
+        nodes: { shadow: { enabled: true, color: 'rgba(0,0,0,.15)', size: 8, x: 0, y: 3 } },
+        edges: { smooth: true }
+      });
+      network.once('stabilizationIterationsDone', () => network.setOptions({ physics: false }));
+    })();
+
+    // ---- charts ----
+    const palette = ['#7c3aed','#2563eb','#db2777','#16a34a','#f59e0b','#0ea5e9','#dc2626','#facc15','#10b981','#8b5cf6'];
+    new Chart(document.getElementById('chartProgram'), {
+      type: 'doughnut',
+      data: { labels: PROG.labels, datasets: [{ data: PROG.values, backgroundColor: palette, borderWidth: 0 }] },
+      options: { plugins: { legend: { position:'bottom', labels: { font: { family:'Inter', size:11 } } } } }
+    });
+    new Chart(document.getElementById('chartTopic'), {
+      type: 'bar',
+      data: { labels: TOPIC.labels, datasets: [{ data: TOPIC.values, backgroundColor: '#7c3aed', borderRadius: 6 }] },
+      options: { indexAxis:'y', plugins: { legend: { display:false } },
+        scales: { x: { grid: { color:'#e2e8f0' } }, y: { grid: { display:false }, ticks: { font: { size:11 } } } } }
+    });
+    new Chart(document.getElementById('chartFunding'), {
+      type: 'bar',
+      data: {
+        labels: TOP_FUND.map(r => r.label),
+        datasets: [
+          { label:'Org. A (€)', data: TOP_FUND.map(r=>r.a), backgroundColor:'#2563eb', borderRadius:5 },
+          { label:'Org. B (€)', data: TOP_FUND.map(r=>r.b), backgroundColor:'#dc2626', borderRadius:5 }
+        ]
+      },
+      options: { indexAxis: 'y', plugins: { legend: { position:'bottom' } },
+        scales: { x: { stacked: true, grid: { color:'#e2e8f0' } }, y: { stacked: true, grid: { display:false }, ticks: { font: { size:11 } } } } }
+    });
+
+    // ---- search filter ----
+    const search = document.getElementById('searchInput');
+    const projectCount = document.getElementById('projectCount');
+    const tbody = document.querySelector('#projectTable tbody');
+    if (search && tbody) {
+      search.addEventListener('input', () => {
+        const q = search.value.toLowerCase().trim();
+        let visible = 0;
+        tbody.querySelectorAll('tr').forEach(tr => {
+          const match = !q || (tr.dataset.search || '').includes(q);
+          tr.style.display = match ? '' : 'none';
+          if (match) visible++;
+        });
+        if (projectCount) projectCount.textContent = visible + ' projet' + (visible>1?'s':'');
+      });
+    }
+
+    // ---- sortable columns ----
+    const table = document.getElementById('projectTable');
+    table.querySelectorAll('thead th').forEach((th, idx) => {
+      th.addEventListener('click', () => {
+        const numeric = th.dataset.numeric === '1';
+        const isAsc = th.classList.contains('sort-asc');
+        table.querySelectorAll('thead th').forEach(o => o.classList.remove('sort-asc','sort-desc'));
+        th.classList.add(isAsc ? 'sort-desc' : 'sort-asc');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort((r1, r2) => {
+          const c1 = r1.children[idx];
+          const c2 = r2.children[idx];
+          const v1 = numeric ? parseFloat(c1.dataset.num || '0') : (c1.textContent || '').trim().toLowerCase();
+          const v2 = numeric ? parseFloat(c2.dataset.num || '0') : (c2.textContent || '').trim().toLowerCase();
+          if (v1 < v2) return isAsc ? 1 : -1;
+          if (v1 > v2) return isAsc ? -1 : 1;
+          return 0;
+        });
+        rows.forEach(r => tbody.appendChild(r));
+      });
+    });
+  </script>
+</body>
+</html>

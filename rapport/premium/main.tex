@@ -1,0 +1,821 @@
+% =============================================================================
+% Rapport d'harmonisation — graphes & open data
+% Structure : template table des matières officielle (article A4 12 pt, marges)
+% Compilation : XeLaTeX (voir Annexe exemple d'exécution).
+% =============================================================================
+\documentclass[12pt,a4paper,twoside]{article}
+
+% utf8 et polices : gérés par fontspec + XeLaTeX (éviter inputenc/T1+lmodern).
+
+\usepackage[
+  top=2.5cm,
+  bottom=2cm,
+  left=3cm,
+  right=2.5cm,
+  headheight=15pt,
+]{geometry}
+\usepackage{microtype}
+\usepackage[shortlabels]{enumitem}
+\setlist{itemsep=2pt, parsep=0pt, topsep=4pt}
+
+% ----- Polices OpenType (XeLaTeX) ; chemins automatiques -----
+\newcommand{\fontpathTGyre}{}
+\newcommand{\fontpathTGyreMath}{}
+\IfFileExists{/usr/local/texlive/2025/texmf-dist/fonts/opentype/public/tex-gyre/texgyrepagella-regular.otf}{%
+  \renewcommand{\fontpathTGyre}{/usr/local/texlive/2025/texmf-dist/fonts/opentype/public/tex-gyre/}%
+  \renewcommand{\fontpathTGyreMath}{/usr/local/texlive/2025/texmf-dist/fonts/opentype/public/tex-gyre-math/}%
+}{%
+  \IfFileExists{/usr/local/texlive/2024/texmf-dist/fonts/opentype/public/tex-gyre/texgyrepagella-regular.otf}{%
+    \renewcommand{\fontpathTGyre}{/usr/local/texlive/2024/texmf-dist/fonts/opentype/public/tex-gyre/}%
+    \renewcommand{\fontpathTGyreMath}{/usr/local/texlive/2024/texmf-dist/fonts/opentype/public/tex-gyre-math/}%
+  }{%
+    \IfFileExists{/usr/share/texlive/texmf-dist/fonts/opentype/public/tex-gyre/texgyrepagella-regular.otf}{%
+      \renewcommand{\fontpathTGyre}{/usr/share/texlive/texmf-dist/fonts/opentype/public/tex-gyre/}%
+      \renewcommand{\fontpathTGyreMath}{/usr/share/texlive/texmf-dist/fonts/opentype/public/tex-gyre-math/}%
+    }{%
+      \PackageError{rapport-harmonisation}{%
+        Polices TeX Gyre introuvables : modifiez \protect\fontpathTGyre\space en tête de ce fichier%
+      }{Installer texlive-fonts-extra ou pointer vers tex-gyre/.}%
+    }%
+  }%
+}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\setmainfont{texgyrepagella-regular.otf}[
+  Path = \fontpathTGyre,
+  BoldFont = texgyrepagella-bold.otf,
+  ItalicFont = texgyrepagella-italic.otf,
+  BoldItalicFont = texgyrepagella-bolditalic.otf,
+  Ligatures = TeX,
+  Numbers = OldStyle,
+]
+\setsansfont{texgyreheros-regular.otf}[
+  Path = \fontpathTGyre,
+  BoldFont = texgyreheros-bold.otf,
+  ItalicFont = texgyreheros-italic.otf,
+  BoldItalicFont = texgyreheros-bolditalic.otf,
+  Ligatures = TeX,
+  Scale = MatchLowercase,
+]
+\setmonofont{texgyrecursor-regular.otf}[
+  Path = \fontpathTGyre,
+  BoldFont = texgyrecursor-bold.otf,
+  ItalicFont = texgyrecursor-italic.otf,
+  BoldItalicFont = texgyrecursor-bolditalic.otf,
+  Scale = 0.92,
+]
+\setmathfont{texgyrepagella-math.otf}[Path = \fontpathTGyreMath]
+
+\usepackage[french]{babel}
+
+\usepackage{xcolor}
+\definecolor{ink}{HTML}{0f172a}
+\definecolor{muted}{HTML}{64748b}
+\definecolor{ruleline}{HTML}{e2e8f0}
+\definecolor{accent}{HTML}{4f46e5}
+\definecolor{accentsoft}{HTML}{eef2ff}
+\definecolor{success}{HTML}{059669}
+\definecolor{warn}{HTML}{b45309}
+\definecolor{surface}{HTML}{f8fafc}
+\definecolor{deep}{HTML}{1e1b4b}
+
+\usepackage[hidelinks,bookmarksnumbered=true,pdfusetitle,unicode]{hyperref}
+\usepackage[nameinlink,capitalize]{cleveref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=accent!85!black,
+  citecolor=accent!85!black,
+  urlcolor=accent!75!black,
+  pdfauthor={Projet graphe recherche EU},
+  pdfsubject={Graphes, Open data, CORDIS, Network science},
+  pdflang={fr},
+}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{array}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{
+  arrows.meta,positioning,calc,fit,backgrounds,shadows,
+  shapes.geometric,matrix,decorations.pathreplacing,shapes.symbols,babel
+}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18, every axis/.append style={font=\small}}
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins,breakable,theorems,listings}
+
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\SetAlgoCaptionLayout{textcenter}
+\SetKwInput{KwData}{Entrées}
+\SetKwInput{KwResult}{Sorties}
+\DontPrintSemicolon
+
+\usepackage{listings}
+\lstdefinestyle{premiumcode}{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{ruleline},
+  backgroundcolor=\color{surface},
+  commentstyle=\color{muted}\itshape,
+  keywordstyle=\color{accent}\bfseries,
+  stringstyle=\color{success},
+  numbers=left,
+  numberstyle=\tiny\color{muted},
+  xleftmargin=1.2em,
+  framexleftmargin=0.8em,
+}
+\lstset{style=premiumcode}
+
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\sffamily\color{muted}\nouppercase{\leftmark}}
+\fancyhead[R]{\small\sffamily\color{ink}\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\headrule}{%
+  \vspace{-6pt}\nointerlineskip{\color{ruleline}\hrule height 0.65pt}\vspace{3pt}%
+}
+
+\titleformat{\section}
+  {\Large\sffamily\bfseries\color{ink}}{\thesection}{0.6em}{}
+  [\vspace{-4pt}{\color{accent!40}\hrule height 2pt width .22\textwidth}]
+\titleformat{\subsection}
+  {\large\sffamily\bfseries\color{ink}}{\thesubsection}{0.5em}{}
+\titlespacing*{\section}{0pt}{18pt}{10pt}
+\titlespacing*{\subsection}{0pt}{14pt}{8pt}
+
+\newcommand{\techterm}[1]{\textsf{\color{deep}#1}}
+
+\newtcolorbox{defbox}[1][]{
+  enhanced,
+  breakable,
+  colback=accentsoft,
+  colframe=accent,
+  boxrule=0.6pt,
+  arc=4pt,
+  left=12pt,
+  right=12pt,
+  top=10pt,
+  bottom=10pt,
+  fonttitle=\sffamily\bfseries,
+  title={#1},
+  attach boxed title to top left={yshift=-3mm,xshift=8mm},
+  boxed title style={colback=accent,colframe=white,sharp corners,boxrule=0pt},
+}
+
+\newtcolorbox{insightbox}{
+  enhanced,
+  breakable,
+  colback=surface,
+  colframe=ruleline,
+  boxrule=0.8pt,
+  arc=5pt,
+  left=14pt,
+  right=14pt,
+  top=12pt,
+  bottom=12pt,
+  borderline west={3pt}{0pt}{accent},
+  before upper={\small\sffamily\textbf{Insight.}\quad},
+}
+
+\newtcolorbox{alertbox}{
+  enhanced,
+  breakable,
+  colback=warn!7,
+  colframe=warn!70!black,
+  arc=4pt,
+  left=12pt,right=12pt,top=8pt,bottom=8pt,
+  fontupper=\small,
+  before upper={\sffamily\textbf{Alerte méthodo.}\quad},
+}
+
+\setlength{\parskip}{0.35em plus 0.15em minus 0.08em}
+
+% ---------- Méta projet ----------
+\title{Analyse de réseaux de financement européen\\[0.35em]
+  \large\mdseries Open data · multiplexe · métriques · visualisations}
+\author{Nourane Hammouda\\
+  Encadrant : Valentin Bouquet}
+\date{Réalisation du 18 mars au 22 mai 2026}
+
+\setcounter{tocdepth}{2}
+
+% ---------- Document ----------
+\begin{document}
+
+\hypersetup{
+  pdftitle={Analyse de réseaux — financement européen (open data)},
+  pdfkeywords={graphes, open data, PageRank, Louvain, Folium, CORDIS, OpenAlex},
+}
+
+\maketitle
+\thispagestyle{empty}
+\vfill
+\begin{center}\small\sffamily\color{muted}
+\textbf{Auteure :} Nourane Hammouda\\
+\textbf{Encadrant :} Valentin Bouquet\\
+\textbf{Période :} 18 mars -- 22 mai 2026\\
+\textbf{Dépôt :} \texttt{projet-graphe-recherche-eu}\\
+\textbf{Compilation :} \texttt{XeLaTeX} · \path{rapport/premium/main.tex}%
+\end{center}
+\vspace*{8mm}
+
+\clearpage
+\thispagestyle{empty}
+\setcounter{page}{1}
+\pagenumbering{roman}
+
+\section*{Remerciements}
+\addcontentsline{toc}{section}{Remerciements}
+
+Je remercie \textbf{Valentin Bouquet} pour l'encadrement et le cadrage méthodologique du projet. Je remercie également les équipes qui maintiennent les portails \textbf{CORDIS} et \textbf{OpenAlex}, sans lesquels l'approche réplicable sur données ouvertes ne serait pas possible.
+
+\clearpage
+
+\tableofcontents
+\clearpage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% ----- Table des matières type harmonisation -----
+\section{Introduction}
+
+\paragraph{Conformité au canevas.}
+Ce document suit le plan imposé : sections \emph{Introduction} à \emph{Bilan}, puis bibliographie, webographie et annexes. Le format est A4 en 12~pt avec les marges du canevas. Les figures et tableaux sont cités explicitement dans le texte (par ex.\ figure~\ref{fig:coeur-dense} et tableau~\ref{tab:libs}).
+
+\subsection{Contexte et positionnement}
+Les politiques de financement de l'Union européenne produisent des \textbf{traces relationnelles riches}~: co-participation à des projets, montants engagés, paysage institutionnel et, via des référentiels complémentaires, des liens vers littérature scientifique et concepts thématiques. La modélisation en graphe permet d'extraire des \techterm{signaux structurels} au-delà de tableaux agrégés.
+
+\begin{defbox}[Réseau de co-financement]
+Un \textbf{graphe de collaboration explicite} $G_{\mathrm{ex}}=(V,E)$~: sommets $V$ = organisations, arête $\{u,v\}\in E$ s'il existe au moins un projet où $u$ et $v$ reçoivent une contribution européenne. Poids entier~: nombre de projets en commun.
+\end{defbox}
+
+\subsection{Vue d'ensemble du travail réalisé}
+\begin{insightbox}
+Chaîne complète~: \textbf{ingestion open data} (CORDIS, OpenAlex), \textbf{normalisation relationnelle}, construction d'un \textbf{graphe multiplexe} (collaboration explicite, similarité thématique, bipartitions financement/projet), calcul de \textbf{métriques de réseau} (PageRank, Louvain, betweenness, contrainte de Burt), et \textbf{visualisations interactives} (Folium, fiches HTML, carte pays, démo bipartite, suite multi-vues \texttt{interactive\_suite.html}).
+\end{insightbox}
+
+\begin{center}
+\begin{tikzpicture}
+  \begin{axis}[
+    width=0.92\textwidth,height=4.6cm,
+    ybar, bar width=10pt, ymin=0,
+    symbolic x coords={Orgs (k), Projets (k), Collabs (k), Fin. og$\to$pj (k)},
+    xtick=data,
+    x tick label style={font=\sffamily\footnotesize},
+    ylabel={\sffamily\small Milliers d'unités},
+    grid=major, major grid style={draw=ruleline},
+  ]
+    \addplot[fill=accent!75, draw=accent] coordinates {
+      (Orgs (k), 41.706) (Projets (k), 34.135) (Collabs (k), 1145.155) (Fin. og$\to$pj (k), 178.558)
+    };
+  \end{axis}
+\end{tikzpicture}
+\end{center}
+{\centering\footnotesize\sffamily\color{muted}
+Synthèse volumétrique indicative (échantillon traité)—alignée sur les exports \texttt{data/processed/}.\par}
+
+\subsection{Problématiques opérationnelles}
+\begin{itemize}[leftmargin=1.2em]
+  \item \textbf{Résilience d'identité :} déduplication robuste d'organisations (noms variables, identifiants hétérogènes).
+  \item \textbf{Échelle :} millions d'évènements de co-présence potentiels—choix algorithmiques (approximation, filtrage d'affichage).
+  \item \textbf{Hétérogénéité :} articuler \textit{fait financier} (CORDIS) et \textit{signal thématique} partiel ou externe (OpenAlex).
+  \item \textbf{Opportunités de collaboration :} définir et prioriser les paires ``proches'' sur le graphe \emph{thématique} mais absentes du graphe \emph{explicite} CORDIS—sans confondre corrélation thématique et intention ou faisabilité contractuelle réelle ; le détail du calcul figure en section~\ref{sec:opportunites}.
+  \item \textbf{Communication :} rendre les résultats navigables pour décideurs et analystes (\emph{storytelling} cartographique, suite HTML à onglets).
+\end{itemize}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  n/.style={circle,draw=accent,fill=accentsoft,minimum size=9mm,font=\footnotesize\sffamily},
+  e/.style={thick},
+]
+  \node[n] (a) at (0,0) {A};
+  \node[n] (b) at (1.8,0.9) {B};
+  \node[n] (c) at (3.6,0) {C};
+  \node[n] (d) at (1.8,-1) {D};
+  \draw[e] (a)--(b)--(c)--(d)--(a)--(c);
+  \node[font=\tiny\sffamily\color{muted},align=center] at (1.8,-2.1)
+    {Exemple de cœur dense\\ \textit{(schéma pédagogique)}};
+\end{tikzpicture}
+\caption{Dans $G_{\mathrm{ex}}$, la forme locale (triangles, ponts) informe brokers et robustesse collaborative.}
+\label{fig:coeur-dense}
+\end{figure}
+
+\section{Environnement de travail}
+
+\subsection{Matériel, système et dépôt}
+Le projet \texttt{projet-graphe-recherche-eu} s'exécute typiquement sous \textbf{macOS ou Linux} avec \textbf{Python 3}. La racine du dépôt contient \texttt{src/} (scripts), \texttt{data/raw/}, \texttt{data/processed/}, \texttt{data/graphs/} et ce rapport sous \texttt{rapport/premium/main.tex}.
+
+\subsection{Environnement Python}
+Création d'un environnement virtuel (\texttt{python3 -m venv env}), activation, puis \texttt{pip install -r requirements.txt} (ou \texttt{requirements-core.txt} si contraintes de version). Le point d'entrée orchestré est \texttt{src/run\_pipeline.py} avec paramètres de volumétrie (\texttt{-{}-max-rows}, \texttt{-{}-max-pages}).
+
+\subsection{Rédaction du rapport (\LaTeX)}
+Ce document est compilé en \textbf{XeLaTeX} (Unicode, polices OpenType TeX Gyre). Si le système ne résout pas les polices par nom, les chemins \texttt{fontpathTGyre} en tête de \texttt{main.tex} pointent vers les \texttt{.otf} du \emph{texmf}.
+
+\section{Description du projet et objectifs}
+
+\subsection{Périmètre et livrables}
+Réaliser une chaîne \textbf{open data $\to$ tables normalisées $\to$ graphes multiplexes $\to$ métriques $\to$ visualisations} sur le financement européen~: identifier des organisations, leurs collaborations contractuelles (CORDIS), enrichir par publications et concepts (OpenAlex), calculer des centralités et communautés, produire une carte interactive (Folium), des fiches organisations, et une \textbf{interface unique} regroupant plusieurs HTML (\texttt{data/graphs/interactive\_suite.html}).
+
+\subsection{Encadrement méthodologique}
+La littérature des \textbf{réseaux scientifiques et d'innovation} mobilise souvent des bipartis acteurs--artefacts, des projections pondérées, et des indicateurs de centralité / modularité\footnote{Communautés (Louvain, Leiden), revues comme \cite{fortunato2010,newman2010}.}. Les données ouvertes imposent nettoyage d'identifiants et contrôle de qualité.
+
+\subsection{Positionnement du multiplexe}
+L'approche combine (i)~une couche \textbf{explicite} (co-financement)~; (ii)~une couche \textbf{latente} (profils thématiques / similarité)~; (iii)~des \textbf{scores de centralité} pour prioriser l'exploration.
+
+\begin{insightbox}
+Le multiplexe autorise des \textbf{recouvrements informatifs} (qui collabore \emph{vs} qui ressemble) et des \emph{écarts} exploitables—par ex.\ paires thématiquement proches sans arête CORDIS, pour recommandations d'opportunité.
+\end{insightbox}
+
+\section{Bibliothèques, Outils et technologies}
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Bibliothèques et rôle dans le projet.}
+\label{tab:libs}
+\begin{tabularx}{\textwidth}{@{}p{2.8cm} X@{}}
+\toprule
+\textbf{Composant} & \textbf{Usage} \\
+\midrule
+pandas / NumPy & CSV/JSON, jointures, matrices. \\
+NetworkX & Graphes, GEXF, PageRank, betweenness (échantillonnée), contrainte Burt, Louvain \cite{hagberg2008}. \\
+scikit-learn & TF-IDF + L2 pour opportunités dans \texttt{visualize\_folium.py}. \\
+Folium / Pyvis & Cartes HTML et démos réseau. \\
+requests / httpx / pyarrow & APIs et E/S. \\
+matplotlib & Figures complémentaires. \\
+Torch / sentence-transformers / FAISS / cdlib / recordlinkage & Présents pour \textbf{extensions} (non requis au flux minimal documenté). \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Modèles numériques et assistance IA}
+\begin{itemize}
+  \item \textbf{Cœur thématique}~: profils \emph{bag-of-concepts} + similarité cosinus (\texttt{build\_thematic\_layer.py}).
+  \item \textbf{Carte}~: TF-IDF n-grammes sur corpus agrégé par organisation.
+  \item \textbf{IA générative}~: assistance au développement et à la documentation (ex. fichiers de contexte projet)~; les métriques publiées proviennent des scripts et des données ouvertes, pas d'une inférence LLM sur le jeu CORDIS.
+\end{itemize}
+
+\section{Travail réalisé}
+
+\subsection{Sources ouvertes : jeux téléchargés et fichiers bruts importés}
+
+\subsubsection{CORDIS (Commission européenne)}
+Le script \path{src/fetch_cordis.py} télécharge automatiquement les exports officiels (fichiers \texttt{.csv} ou archives \texttt{.zip}) depuis \url{https://cordis.europa.eu/data}~: jeux projets et organisations pour \textbf{Horizon~2020} (\texttt{cordis-h2020*\ldots}) et \textbf{Horizon Europe} (\texttt{cordis-he*\ldots}, variantes de casse dans les URL gérées par le script). Après téléchargement, des versions \emph{écrêtées} (option \texttt{-{}-max-rows}) sont écrites dans \path{data/raw/cordis/} sous les noms canoniques suivants lorsque les jeux sont complets~:
+\begin{itemize}[nosep]
+  \item \path{h2020_projects_trimmed.csv}, \path{he_projects_trimmed.csv} (métadonnées projets)~;
+  \item \path{h2020_organizations_trimmed.csv}, \path{he_organizations_trimmed.csv} (participations financées par projet).
+\end{itemize}
+Le parseur utilise le séparateur \textbf{point-virgule} et l'encodage \texttt{UTF-8-sig}, ce qui reflète la distribution standard CORDIS. Sur un dépôt partiel (par exemple uniquement Horizon~2020), seuls les fichiers effectivement téléchargés sont pris en compte dans l'étape de normalisation.
+
+\subsubsection{OpenAlex}
+Le script \path{src/fetch_openalex.py} interroge l'API REST \path{works} (\url{https://api.openalex.org/works}) avec un filtre sur le bailleur \textbf{Commission européenne} (\texttt{awards.funder\_id:F4320332161}), des paramètres \texttt{-{}-max-pages} et \texttt{-{}-per-page}, et une pagination par \texttt{cursor}. Le corpus collecté est stocké comme une \textbf{liste JSON} dans \path{data/raw/openalex/works_ec_funded.json}.
+
+\subsubsection{OpenAIRE (optionnel)}
+La collecte OpenAIRE est déclenchée uniquement lorsque \path{src/run_pipeline.py} est invoqué avec \texttt{-{}-include-openaire} (\path{src/fetch_openaire.py}) ; elle peut enrichir ou croiser avec d'autres identifiants, mais n'est pas requise pour le flux documenté ci-dessous.
+
+\subsection{Traitement relationnel (\texorpdfstring{\texttt{clean\_normalize.py}}{clean\_normalize.py}) : logiques d'extraction}
+
+\paragraph{Lecture CORDIS.}
+Les tableaux projets et organisations sont lus avec détection souple des noms de colonnes (\texttt{pick\_column})~: par exemple \texttt{id} / \texttt{projectID} pour l'identifiant projet, \texttt{ecContribution} / \texttt{netEcContribution} pour le montant, \texttt{geolocation} pour \texttt{lat,lon}, etc. Les budgets textuels sont convertis en flottants (virgule remplacée si besoin).
+
+\paragraph{Identifiant stable d'organisation (\texttt{org\_id}).}
+Si CORDIS fournit un identifiant non vide (PIC, numéro interne, TVA, etc.), il est normalisé et concaténé au code pays pour former \texttt{org\_id}. Sinon, un hachage \textbf{SHA-1} (\texttt{digest[:10]}) est calculé sur la chaîne concaténée nom\texttt{|}ville\texttt{|}type afin de stabiliser les fusions lorsque l'identifiant source manque (\path{make_org_id}).
+
+\paragraph{Projection ``co-projets''.}
+Pour chaque projet regroupant au moins deux organisations, toutes les paires distinctes sont générées ; le fichier \path{edges_org_org_explicit.csv} contient une ligne par paire avec le poids \texttt{weight\_common\_projects} = nombre de projets en commun. Le fichier \path{edges_org_project.csv} matérialise la participation pondérée (montant européen) d'une organisation à un projet (\texttt{source\_org\_id}, \texttt{target\_project\_id}, \texttt{weight\_eur}). Le tableau \path{organizations.csv} agrège par organisation~: budget total perçu, nombre de projets distincts, coordonnées (géocode CORDIS si présent).
+
+\paragraph{Ouverture via OpenAlex.}
+Les institutions citées dans OpenAlex sont normalisées de la même manière que \texttt{org\_name\_norm} côté CORDIS. La jointure textuelle \textbf{exacte sur la normalisation du nom} alimente \path{edges_org_publication.csv} puis, via les concepts attachés aux œuvres, \path{edges_org_concept.csv} où le poids d'une paire (org, concept) est la \textbf{somme des scores OpenAlex} des concepts au fil des publications liées à l'organisation.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Huit tables normalisées sous \texttt{data/processed/} (\texttt{*.csv}) et fichier OpenAlex brut associé.}
+\label{tab:processed-files}
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+\toprule
+\textbf{Fichier relatif} & \textbf{Rôle (schéma logique)} \\
+\midrule
+\path{organizations.csv} &
+  Une ligne par \texttt{org\_id}~: dénomination, pays, ville, type, budgets agrégés, \texttt{nb\_projects}. \\
+\path{projects.csv} &
+  Projet~(titre, dates, enveloppe financière indicative, lien programme). \\
+\path{publications.csv} /
+\path{concepts.csv} &
+  Table des œuvres OpenAlex (+ concepts et scores lorsque présents). \\
+\path{edges_org_project.csv} &
+  Financement européen (poids euros) Org $\rightarrow$ Projet. \\
+\path{edges_org_org_explicit.csv} &
+  Graphe projeté \emph{explicite} Org--Org avec poids = \# projets communs. \\
+\path{edges_org_publication.csv} &
+  Lien après appariement de noms Org $\rightarrow$ Publication. \\
+\path{edges_org_concept.csv} &
+  Profil thématique par organisation~(somme des scores concept). \\
+\path{data/raw/openalex/works_ec_funded.json} &
+  Source brute API OpenAlex utilisée avant fusion. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{Contrôle qualité et provenance}
+\begin{table}[htbp]
+\centering
+\caption{Exemples de contrôles pipeline.}
+\begin{tabularx}{0.95\textwidth}{l X}
+\toprule
+\sffamily Axe & \sffamily Contrôle \\
+\midrule
+Couverture & géolocalisation, ratio renseigné \\
+Cohérence & budgets $\geq 0$, clés résolues \\
+Lignée & \texttt{data\_provenance\_report.json} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.9, every node/.style={font=\sffamily\footnotesize}]
+  \foreach \x/\lab in {0/Structure, 2.2/Géoloc., 4.4/Viz.} {\node[anchor=south] at (\x+1,3.2) {\lab};}
+  \node[anchor=east] at (-0.2,2.5) {Cible};
+  \node[anchor=east] at (-0.2,0.9) {Obs.};
+  \fill[accent!15] (0,2) rectangle (2,3);
+  \fill[accent!35] (2,2) rectangle (4,3);
+  \fill[accent!25] (4,2) rectangle (6,3);
+  \fill[accent!55] (0,0.5) rectangle (2,1.5);
+  \fill[accent!40] (2,0.5) rectangle (4,1.5);
+  \fill[accent!50] (4,0.5) rectangle (6,1.5);
+  \draw[ink!20] (0,0.5) grid (6,3);
+\end{tikzpicture}
+\caption{Heatmap pédagogique (axes qualité symboliques).}
+\label{fig:heatmap-qual}
+\end{figure}
+
+\subsection{Exports graphes après normalisation}
+
+\subsubsection{Couche collaboration explicite (\texorpdfstring{\texttt{build\_graph.py}}{build_graph.py})}
+Le graphe multiplexe est exporté en \textbf{GEXF} sous \path{data/graphs/collab_explicit.gexf}. Il représente organisations, projets et publications ainsi que les arêtes de financement, de co-participation et les liens attribution--publication. La couche utilisée dans \path{src/algorithms.py} pour PageRank ou Louvain est le \textbf{sous-graphe des organisations} lorsque les nœuds portent \texttt{node\_type\,=\,organization}, avec pondération selon les poids agrégés d'arête.
+
+\subsubsection{Couche thématique (\texorpdfstring{\texttt{build\_thematic\_layer.py}}{build_thematic_layer.py})}
+À partir de \path{edges_org_concept.csv}, on construit une matrice creuse \textbf{organisation $\times$ concept} où chaque coefficient est la somme des scores de concepts observés pour l'organisation. Les lignes sont normalisées en norme euclidienne (éviter division par zéro), puis la \textbf{similarité cosinus} entre chaque paire d'organisations $(i,j)$ est le produit scalaire des vecteurs unitaires correspondants. Une arête du graphe thématique implicite $G_{\mathrm{th}}$ est créée si la similarité $s_{ij}$ vérifie $s_{ij} \geq \theta$, avec $\theta=\texttt{0{,}30}$ par défaut (\texttt{-{}-threshold}). Le fichier produit est \path{data/graphs/thematic_implicit.gexf}. Les couples $(i,j)$ thématiquement liés mais \textbf{sans} arête dans \path{edges_org_org_explicit.csv} constituent des candidats préliminaires d'«~opportunité~».
+
+\subsection{Opportunités de collaboration : définition quantitative}
+\label{sec:opportunites}
+Le script \path{src/gap_analysis.py} matérialise l'écart entre \emph{similarité thématique} et \emph{collaboration CORDIS observée}.
+
+\paragraph{Sélection des paires candidates.}
+Pour chaque arête de $G_{\mathrm{th}}$ de poids $s=\texttt{weight}$ (la similarité cosinus)~:
+\begin{enumerate}[nosep]
+  \item si $s < \texttt{min\_score}$ (valeur par défaut \textbf{0{,}40}, option \texttt{-{}-min-score}), la paire est rejetée ;
+  \item si la même paire d'organisations apparaît déjà comme collaboration explicite dans \path{edges_org_org_explicit.csv}, elle est \textbf{exclue} (ce n'est pas un ``trou'', mais une collaboration avérée).
+\end{enumerate}
+
+\paragraph{Priorisation multi-critères (\texttt{gap\_analysis.py}).}
+Notons $\mathrm{broker\_bonus}=1$ lorsque au moins une organisation appartient à l'ensemble des \emph{relays} défini comme intersection d'un fort betweenness dans le graphe explicite et d'un classement parmi les 30\,\% meilleures valeurs positives de contrainte de Burt sur le graphe thématique (\texttt{burt\_constraint\_thematic} issue de \path{organization_metrics.json}). Soient $c$ valant 1 si les deux pays diffèrent, $t$ valant 1 si les deux types juridiques diffèrent, et $\mathrm{balance}=\min\{n_{\mathrm{proj}}^{(a)},n_{\mathrm{proj}}^{(b)}\}\,/\,\max\{n_{\mathrm{proj}}^{(a)},n_{\mathrm{proj}}^{(b)}\}$ le rapport équilibrant les volumes projet. La priorité retenue est
+\begin{equation}
+\label{eq:prio-gap}
+\pi \;=\; 0{,}60\, s \;+\; 0{,}15\, \mathrm{broker\_bonus} \;+\; 0{,}10\, c \;+\; 0{,}10\, t \;+\; 0{,}05\, \mathrm{balance}\,,
+\end{equation}
+puis coupée dans $[0,1]$ et arrondie. Les seuils métier suivants attribuent une étiquette \texttt{priority\_label}~: $\pi\geq 0{,}80$ «~Très forte~», $\geq 0{,}65$ «~Forte~», $\geq 0{,}55$ «~Intermédiaire~», sinon «~À surveiller~».
+
+\paragraph{Livrables JSON.}
+Jusqu'à \textbf{3\,000} fiches sont triées selon (\texttt{priority\_score} décroissant, \texttt{thematic\_score} décroissant) puis écrites dans \path{data/graphs/gap_analysis_top.json} (champs~: identifiants, scores, budgets, attributs booleans transfrontaliers/trans-types, rattache broker). Sur l'exemplaire mesuré pour ce rapport, le fichier contenait \textbf{1\,674} paires après filtrage—aussi moins que le plafonnement 3000 lorsque peu de couples passent successivement les seuils $\theta$ et \texttt{min\_score}.
+
+\subsection{Statistiques sur l'exemplaire traité (\texorpdfstring{\texttt{data/processed/}}{data/processed})}
+Les grandeurs suivantes résultent du comptage automatique sur le dépôt au moment de la rédaction (cf.\ tableau~\ref{tab:stats-depot}); elles permettent d'objectiver l'échelle lors de la défense tout en demeurant \textbf{dépendantes} des paramètres \texttt{-{}-max-rows} / réseau téléchargé.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Volumes et agrégats sur l'exemplaire local (ordre de grandeur projet).}
+\label{tab:stats-depot}
+\begin{tabular}{@{}l r@{}}
+\toprule
+\textbf{Mesure} & \textbf{Valeur} \\
+\midrule
+Organisations uniques (\path{organizations.csv}) & 41\,706 \\
+Codes pays institutionnels distincts\textsuperscript{*} & 177 \\
+Somme budgets perçus CORDIS (\path{budget_total_received}) & $\approx$\,68{,}1~G€~(68\,071\,318\,274{,}54~€ bruts agrégés) \\
+Projets listés (\path{projects.csv}) & 34\,135 \\
+Lignes financement org$\rightarrow$projet (\path{edges_org_project.csv}) & 178\,558 \\
+Paires collaborations explicites (\path{edges_org_org_explicit.csv}) & 1\,145\,155 \\
+Associations org$\rightarrow$concept (\path{edges_org_concept.csv}) & 4\,725 \\
+Œuvres OpenAlex retenues (\path{publications.csv}) & 200 \\
+Nœuds / arêtes dans $G_{\mathrm{th}}$ (export GEXF) & 160 / 2\,737 \\
+Communities Louvain (collaboration vs thème) & 4\,391 / 9 \\
+Paires dans \path{gap_analysis_top.json} & 1\,674 \\
+Premier rang PageRank collaborations (\path{metrics_summary.json}) & $\approx$\,5{,}285$\times10^{-3}$ \\
+\bottomrule
+\end{tabular}\\[6pt]
+\footnotesize\textsuperscript{*} Champ pays non vide ; codes erronés ou manquants réduisent mécaniquement ce décompte.
+\end{table}
+
+\subsection{Méthodologie et chaîne de traitement}
+Principes~: traçabilité raw $\rightarrow$ processed $\rightarrow$ graphs, scripts re-jouables, séparation calcul batch / rendu HTML. Validité interne (jointures) \emph{vs} externe (lisibilité métier).
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=0.85cm and 1.05cm,
+  st/.style={draw=accent!55, rounded corners=6pt, minimum height=1.05cm, minimum width=2.75cm,
+    align=center, font=\footnotesize\sffamily, fill=white, thick},
+  src/.style={st, fill=accentsoft},
+  arr/.style={-{Stealth}, thick, draw=accent!70},
+]
+  \node[src] (src) {Sources\\\scriptsize CORDIS · OpenAlex};
+  \node[st, right=of src] (norm) {Normalisation\\\scriptsize 8 CSV};
+  \node[st, right=of norm] (g) {Graphes\\\scriptsize GEXF};
+  \node[src, right=of g] (viz) {Viz\\\scriptsize Folium};
+  \draw[arr] (src) -- (norm); \draw[arr] (norm) -- (g); \draw[arr] (g) -- (viz);
+\end{tikzpicture}
+\caption{Chaîne de traitement.}
+\label{fig:chaine}
+\end{figure}
+
+\subsection{Modélisation, exports et fonctionnalités des graphes}
+\textbf{Multiplexe explicite} (\texttt{collab\_explicit.gexf})~: nœuds organisation / projet / publication et arêtes financement, co-projet, authorship (\texttt{build\_graph.py}). \textbf{Sous-graphe org} pour PageRank, betweenness, Louvain (\texttt{algorithms.py}).
+
+\textbf{Thématique implicite} (\texttt{thematic\_implicit.gexf})~: cosinus sur matrice org$\times$concepts, seuil \texttt{-{}-threshold}. \textbf{Écarts}~: \texttt{gap\_analysis\_top.json} ; \textbf{TF-IDF} sur la carte pour opportunités complémentaires. Script \texttt{embed\_organizations.py} pour profils concepts compacts.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  ent/.style={ellipse, minimum width=2cm, minimum height=9mm, draw=accent, fill=accentsoft, font=\footnotesize\sffamily},
+]
+  \node[ent] (u) at (0,1) {Org $u$};
+  \node[ent] (v) at (3,1) {Org $v$};
+  \node[ent] (p) at (1.5,-0.9) {Projet $p$};
+  \draw[thick,-Stealth] (u)--node[left,font=\tiny]{$(u,p)$} (p);
+  \draw[thick,-Stealth] (v)--node[right,font=\tiny]{$(v,p)$} (p);
+  \draw[dashed,thick] (u) to[bend left=28] node[above,font=\tiny]{$\{u,v\}\in E$} (v);
+\end{tikzpicture}
+\caption{Co-participation et projection explicite (schéma).}
+\label{fig:bipartite}
+\end{figure}
+
+\subsection{Pipeline logiciel et architecture}
+\begin{verbatim}
+fetch_* -> clean_normalize -> build_graph / build_thematic_layer /
+  gap_analysis -> algorithms -> visualize_folium
+\end{verbatim}
+Triptyque \emph{data / compute / viz}~; filtrage d'affichage PageRank sur la carte, HTML atomique, reprise si métriques absentes (fallback \texttt{nb\_projects}).
+
+\subsection{Algorithmes de graphes (rappel opérationnel)}
+Parcours (BFS/DFS), plus courts chemins (Dijkstra), PageRank, Louvain \cite{blondel2008}, betweenness échantillonnée, contrainte de Burt—implémentations et sources dans \texttt{src/algorithms.py} et dépendances NetworkX.
+
+\subsection{Visualisations interactives}
+\begin{itemize}
+  \item \textbf{Carte réseau de recherche}~: \texttt{research\_network\_map\_folium.html}—marqueurs, popups, couches collaboration / thématique, liens vers fiches \texttt{org\_profiles/}. Les ``top organisations'' du panneau sont les plus fortes en \texttt{pagerank\_collab} (PageRank sur le sous-graphe org--org explicite, arêtes pondérées), parmi les organisations conservées après filtres programme et top-$N$, avec budget en second critère.
+  \item \textbf{Carte collaborations pays}~: \texttt{country\_collaborations\_map.html}—vue macro des liens transnationaux.
+  \item \textbf{Démo bipartite multi-projets}~: \texttt{demo\_multi\_project\_pair.html}—exemple CNRS $\leftrightarrow$ CEA (vis-network, tableaux filtrables).
+  \item \textbf{Suite unique (onglets)}~: \texttt{interactive\_suite.html} agrège les trois vues précédentes dans une même interface navigateur avec navigation par sections cliquables et chargement paresseux des iframes pour préserver le dimensionnement Leaflet.
+\end{itemize}
+
+\subsection{Résultats quantitatifs (indicatifs)}
+Synthèse issues de \texttt{metrics\_summary.json} sur la base complète typique~: 41\,706 nœuds org, 1\,145\,155 arêtes collaboratives, 4\,391 communautés Louvain (collab.) ; graphe thématique 160 nœuds, 2\,737 arêtes, 9 communautés. Exemple top PageRank~: \texttt{DE\_DE129515865\_\ldots} à 0{,}00528, etc.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.88\textwidth,height=5cm,
+  ymode=log, log basis y={10},
+  ybar, ymin=1, ymax=3e6,
+  symbolic x coords={VC,EC,NC,ET},
+  xtick=data,
+  xticklabels={{$|V|$ collab.},{$|E|$ collab.},{\# com.},{$|E|$ thème}},
+  xticklabel style={text width=2.1cm,align=center},
+  ylabel={\sffamily\small Échelle log.},
+  grid=major, major grid style={draw=ruleline},
+]
+  \addplot[fill=accent!70, draw=accent] coordinates {(VC, 41706) (EC, 1145155) (NC, 4391) (ET, 2737)};
+\end{axis}
+\end{tikzpicture}
+\caption{Volumétrie (log) collaboration \emph{vs} thématique.}
+\label{fig:vol-log}
+\end{figure}
+
+\section{Difficultés rencontrées}
+
+\begin{itemize}
+  \item \textbf{Schémas CORDIS hétérogènes}~: mapping souple de colonnes et IDs manquants nécessitant un hachage composite pour \texttt{org\_id}.
+  \item \textbf{Échelle}~: betweenness exacte irréaliste~; échantillonnage et bornes \texttt{-{}-max-edges} pour la carte.
+  \item \textbf{Alignement OpenAlex $\leftrightarrow$ organisations}~: appariement par nom normalisé, faux positifs possibles.
+  \item \textbf{Navigateur}~: HTML volumineux~; filtrage top-$N$ pour rester fluide.
+  \item \textbf{\LaTeX{} XeLaTeX}~: résolution des polices TeX Gyre selon l'OS.
+  \item \textbf{Dépendances Python}~: Torch / versions~; recours à \texttt{requirements-core.txt} sur certaines plateformes.
+\end{itemize}
+
+\begin{alertbox}
+Les limites de \textbf{couverture} CORDIS/OpenAlex et d'interprétation causale des centralités demeurent~: voir bilan.
+\end{alertbox}
+
+\section{Bilan}
+
+\subsection{Conclusion}
+Ce projet formalise une chaîne reproductible \techterm{open data $\to$ graphe $\to$ métriques $\to$ visualisation} sur le financement européen, avec multiplexe explicite/thématique et interface cartographique. Les points forts incluent la modularité des scripts, une échelle réaliste (dizaines de milliers d'organisations, million d'arêtes collaboratives) et la double lecture contractuelle \emph{vs} similarité. La valeur combine \textbf{pipeline traçable} et \textbf{UX d'exploration}~; les métriques doivent être interprétées avec prudence (biais de données, pas de causalité directe).
+
+\subsection{Perspectives}
+Multiplex temporel, embeddings neuronaux optionnels (dépendances déjà listées), RAG sur fiches projet, évaluation utilisateur, API en lecture seule sur les JSON, alignement Leiden/cdlib pour comparaison des partitions.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[x=1cm,y=0.35cm]
+  \draw[-{Stealth}, thick, accent] (0,0) -- (8,0);
+  \foreach \x/\lab in {0/Réf., 2/Ingestion, 4/Features, 6/Modèles, 8/API}
+    \draw[accent] (\x,0.2)--(\x,-0.2) node[below, font=\tiny\sffamily] {\lab};
+\end{tikzpicture}
+\caption{Roadmap indicative.}
+\label{fig:roadmap}
+\end{figure}
+
+\clearpage
+\section*{Abstract (English)}
+\addcontentsline{toc}{section}{Abstract (English)}
+\begin{quote}
+\small\sffamily
+\noindent This memorandum documents an end-to-end pipeline from European open funding data to interactive graph analytics: multiplex modeling, scalable network metrics (PageRank, community detection, brokerage proxies), and publication-grade visualizations—including a single-tabbed HTML hub aggregating country-level, institution-level, and bipartite demo views.
+\end{quote}
+
+\clearpage
+\section{Bibliographie}
+\renewcommand{\refname}{}
+\begin{thebibliography}{99}
+
+\bibitem{lamport1994}
+L. \textsc{Lamport}, \textit{\LaTeX: A document preparation system}, Addison-Wesley, 2$^e$~éd., 1994.
+
+\bibitem{newman2010}
+M. E. J. \textsc{Newman}, \textit{Networks: An Introduction}, Oxford University Press, 2010.
+
+\bibitem{blondel2008}
+V. D. \textsc{Blondel} \emph{et al.}, ``Fast unfolding of communities in large networks,'' \textit{J. Stat. Mech.}, 2008.
+
+\bibitem{fortunato2010}
+S. \textsc{Fortunato}, ``Community detection in graphs,'' \textit{Physics Reports}, vol.~486, no.~3--5, 2010.
+
+\bibitem{hagberg2008}
+A. A. \textsc{Hagberg}, D. A. \textsc{Schult}, P. J. \textsc{Swart}, ``Exploring network structure, dynamics, and function using NetworkX,'' \textit{Proc. SciPy}, 2008.
+
+\end{thebibliography}
+
+\clearpage
+\section{Webographie}
+\begin{thebibliography}{99}
+
+\bibitem{cordisdata}
+Commission européenne, \textit{CORDIS — Données de recherche de l'UE}.\\
+\url{https://cordis.europa.eu/data}
+
+\bibitem{openalex}
+OpenAlex, \textit{API works}.\\
+\url{https://api.openalex.org/}
+
+\bibitem{openaire}
+OpenAIRE Graph API (optionnel).\\
+\url{https://api.openaire.eu/}
+
+\bibitem{networkx}
+NetworkX — bibliothèque Python pour graphes.\\
+\url{https://networkx.org/}
+
+\bibitem{scikitlearn}
+scikit-learn — apprentissage automatique en Python.\\
+\url{https://scikit-learn.org/}
+
+\bibitem{folium}
+Folium — cartes interactives.\\
+\url{https://python-visualization.github.io/folium/}
+
+\end{thebibliography}
+
+\clearpage
+\appendix
+\makeatletter
+\def\@seccntformat#1{Annexe~\csname the#1\endcsname:\quad}
+\makeatother
+
+\section{Cahier des charges}
+
+\subsection{Contexte et périmètre}
+Mettre en œuvre une chaîne \textbf{open data} reliant financements européens (CORDIS), publications et concepts (OpenAlex, en partie optionnel OpenAIRE), pour produire des \textbf{graphes analysables} (collaboration explicite, proximité thématique, écarts / opportunités) et des \textbf{visualisations navigables}.
+
+\subsection{Exigences fonctionnelles}
+\begin{itemize}
+  \item \textbf{Ingestion}~: téléchargement ou dépôt contrôlé des jeux bruts, paramètres de volumétrie (\texttt{-{}-max-rows}, \texttt{-{}-max-pages}).
+  \item \textbf{Normalisation}~: huit tables CSV UTF-8 sous \texttt{data/processed/} avec identifiants organisations stables.
+  \item \textbf{Graphes}~: export GEXF multiplexe explicite, couche thématique implicite, JSON d'analyse d'écarts ; métriques (centralités, communautés, contrainte).
+  \item \textbf{Livrables utilisateur}~: carte Folium HTML, fiches organisations, synthèses JSON (\texttt{metrics\_summary.json}, provenance), et page \texttt{interactive\_suite.html} pour accéder aux principales vues dans un seul navigateur.
+\end{itemize}
+
+\subsection{Exigences non fonctionnelles}
+\begin{itemize}
+  \item \textbf{Reproductibilité}~: scripts Python versionnés, environnement \texttt{venv} et \texttt{requirements.txt}.
+  \item \textbf{Traçabilité}~: rapport de provenance (\texttt{data\_provenance\_report.json}) après vérification.
+  \item \textbf{Performance praticable}~: limitation d'affichage navigateur tout en conservant les données complètes pour les analyses batch.
+\end{itemize}
+
+\subsection{Critères de réception (indicatifs)}
+\begin{itemize}
+  \item Pipeline \texttt{run\_pipeline.py} exécutable de bout en bout sur un échantillon documenté.
+  \item Fichiers attendus présents~: CSV normalisés, \texttt{collab\_explicit.gexf}, \texttt{thematic\_implicit.gexf}, métriques, carte HTML, suite interactive.
+\end{itemize}
+
+\section{Exemple d'exécution du projet}
+
+\subsection{Préparation de l'environnement}
+\begin{lstlisting}[language=bash]
+cd projet-graphe-recherche-eu
+python3 -m venv env
+source env/bin/activate   # Windows: env\Scripts\activate
+pip install -r requirements.txt
+\end{lstlisting}
+
+\subsection{Pipeline complet (extrait type)}
+\begin{lstlisting}[language=bash]
+python src/run_pipeline.py --max-rows 20000 --max-pages 5
+# étapes détaillées possibles :
+# python src/fetch_cordis.py --max-rows 40000
+# python src/fetch_openalex.py --max-pages 8 --per-page 200
+# python src/clean_normalize.py
+# python src/build_graph.py
+# python src/build_thematic_layer.py --threshold 0.35
+# python src/gap_analysis.py --min-score 0.5
+# python src/algorithms.py
+# python src/visualize_folium.py --max-edges 400
+\end{lstlisting}
+
+\subsection{Arborescence indicative après exécution}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+projet-graphe-recherche-eu/
+  data/raw/cordis/          # CSV CORDIS
+  data/raw/openalex/        # JSON œuvres
+  data/processed/           # 8 CSV normalisés
+  data/graphs/              # GEXF, JSON, HTML, org_profiles/, interactive_suite.html
+  src/                      # scripts du pipeline
+  rapport/premium/main.tex  # ce rapport (XeLaTeX)
+\end{lstlisting}
+
+\subsection{Compilation du présent rapport}
+\begin{lstlisting}[language=bash]
+cd rapport/premium
+latexmk -xelatex -interaction=nonstopmode main.tex
+\end{lstlisting}
+
+\subsection{Lecture programmatique de la synthèse métriques}
+\begin{lstlisting}[language=Python]
+import json
+from pathlib import Path
+
+p = Path("data/graphs/metrics_summary.json")
+summary = json.loads(p.read_text(encoding="utf-8"))
+print(summary["collab_nodes"], summary["collab_edges"])
+\end{lstlisting}
+
+\section{Manuel utilisateur}
+
+\subsection{Objectif}
+Permettre à un utilisateur de \textbf{regénérer les données}, \textbf{ouvrir la carte ou la suite HTML} et \textbf{interpréter} les couches sans relire l'intégralité du code.
+
+\subsection{Lancer le pipeline}
+\begin{itemize}
+  \item Racine du dépôt, environnement activé.
+  \item Commande recommandée~: \texttt{python src/run\_pipeline.py} avec bornes adaptées à la machine.
+  \item En cas d'échec sur une étape, enchaîner manuellement les scripts du README~: \texttt{fetch\_*}, \texttt{clean\_normalize.py}, construction des graphes, \texttt{algorithms.py}, visualisation.
+\end{itemize}
+
+\subsection{Carte interactive et suite multi-vues}
+\begin{itemize}
+  \item Carte institutionnelle~: ouvrir \path{data/graphs/research_network_map_folium.html}.
+  \item Vue unique (recommandée pour présentation)~: ouvrir \path{data/graphs/interactive_suite.html}, puis sélectionner l'onglet souhaité (collaborations pays, réseau européen, démo bipartite multi-projets).
+  \item Recherche, zoom, bascule des couches~; depuis une popup organisation, suivre le lien vers \path{org_profiles/} si généré.
+\end{itemize}
+
+\subsection{Paramètres utiles}
+\begin{itemize}
+  \item \texttt{build\_thematic\_layer.py -{}-threshold}~: seuil de similarité cosinus sur le profil concepts (défaut~0,30).
+  \item \texttt{gap\_analysis.py -{}-min-score}~: filtre minimal sur le graphe thématique pour les opportunités.
+  \item \texttt{visualize\_folium.py -{}-max-edges}~: borne d'arêtes pour garder une carte fluide.
+\end{itemize}
+
+\subsection{Dépannage (aperçu)}
+\begin{itemize}
+  \item \textbf{Fichier manquant}~: relancer \texttt{clean\_normalize.py} ou l'étape indiquée dans le message d'erreur.
+  \item \textbf{Compilation LaTeX}~: compiler avec \textbf{XeLaTeX} ; si les polices TeX Gyre ne sont pas résolues par le système, ajuster les chemins \texttt{fontpathTGyre} en tête de \texttt{main.tex}.
+  \item \textbf{Dépendances lourdes}~: utiliser \texttt{requirements-core.txt} sur Python récent si nécessaire.
+  \item \textbf{iframes vides dans la suite}~: ouvrir \texttt{interactive\_suite.html} depuis le dossier \texttt{data/graphs/} (chemins relatifs vers les trois HTML).
+\end{itemize}
+
+\end{document}

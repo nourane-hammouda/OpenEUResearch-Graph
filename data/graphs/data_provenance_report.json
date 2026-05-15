@@ -1,0 +1,96 @@
+{
+  "generated_at_utc": "2026-04-03T14:38:15.805890+00:00",
+  "sources": {
+    "cordis": {
+      "official_portal": "https://cordis.europa.eu/data",
+      "downloads": [
+        {
+          "exists": true,
+          "path": "data/raw/cordis/h2020_projects_trimmed.csv",
+          "size_bytes": 365778,
+          "modified_utc": "2026-04-03T14:38:00.000735+00:00"
+        },
+        {
+          "exists": false,
+          "path": "data/raw/cordis/h2020_organizations_trimmed.csv"
+        },
+        {
+          "exists": false,
+          "path": "data/raw/cordis/he_projects_trimmed.csv"
+        },
+        {
+          "exists": false,
+          "path": "data/raw/cordis/he_organizations_trimmed.csv"
+        }
+      ],
+      "row_estimates": {
+        "data/raw/cordis/h2020_projects_trimmed.csv": 1000,
+        "data/raw/cordis/h2020_organizations_trimmed.csv": 0,
+        "data/raw/cordis/he_projects_trimmed.csv": 0,
+        "data/raw/cordis/he_organizations_trimmed.csv": 0
+      }
+    },
+    "openalex": {
+      "official_api": "https://api.openalex.org/works",
+      "ec_funder_id": "F4320332161",
+      "dump": {
+        "exists": true,
+        "path": "data/raw/openalex/works_ec_funded.json",
+        "size_bytes": 18855051,
+        "modified_utc": "2026-04-03T14:38:05.672719+00:00"
+      }
+    }
+  },
+  "processed_tables": {
+    "organizations": {
+      "exists": true,
+      "path": "data/processed/organizations.csv",
+      "size_bytes": 98792,
+      "modified_utc": "2026-04-03T14:38:06.250653+00:00"
+    },
+    "projects": {
+      "exists": true,
+      "path": "data/processed/projects.csv",
+      "size_bytes": 4284,
+      "modified_utc": "2026-04-03T14:38:06.251100+00:00"
+    },
+    "publications": {
+      "exists": true,
+      "path": "data/processed/publications.csv",
+      "size_bytes": 36870,
+      "modified_utc": "2026-04-03T14:38:06.252270+00:00"
+    },
+    "edges_org_project": {
+      "exists": true,
+      "path": "data/processed/edges_org_project.csv",
+      "size_bytes": 53451,
+      "modified_utc": "2026-04-03T14:38:06.258595+00:00"
+    },
+    "edges_org_org_explicit": {
+      "exists": true,
+      "path": "data/processed/edges_org_org_explicit.csv",
+      "size_bytes": 955552,
+      "modified_utc": "2026-04-03T14:38:06.274962+00:00"
+    },
+    "edges_org_publication": {
+      "exists": true,
+      "path": "data/processed/edges_org_publication.csv",
+      "size_bytes": 2298,
+      "modified_utc": "2026-04-03T14:38:06.275629+00:00"
+    },
+    "edges_org_concept": {
+      "exists": true,
+      "path": "data/processed/edges_org_concept.csv",
+      "size_bytes": 20990,
+      "modified_utc": "2026-04-03T14:38:06.276410+00:00"
+    }
+  },
+  "integrity_checks": {
+    "n_organizations": 851,
+    "n_projects": 72,
+    "n_edges_org_project": 1000,
+    "funding_non_negative": true,
+    "org_edge_coverage": 1.0,
+    "project_edge_coverage": 1.0
+  }
+}

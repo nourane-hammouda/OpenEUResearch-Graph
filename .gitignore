@@ -1,0 +1,40 @@
+# Python
+env/
+.venv/
+__pycache__/
+*.py[cod]
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Secrets / local
+.env
+.env.*
+
+# Données lourdes / reproductibles avec le pipeline
+data/raw/
+data/processed/
+
+# Millions de fichiers HTML (fiches organisations)
+data/graphs/org_profiles/
+
+# GEXF de collaboration très volumineux (> limite GitHub recommandée)
+data/graphs/*.gexf
+
+# LaTeX (garder source + PDF ; pas les artefacts)
+rapport/premium/*.aux
+rapport/premium/*.log
+rapport/premium/*.out
+rapport/premium/*.toc
+rapport/premium/*.fls
+rapport/premium/*.fdb_latexmk
+rapport/premium/*.xdv
+rapport/premium/*.synctex.gz
+rapport/premium/*.bbl
+rapport/premium/*.blg
+
+# OS / IDE
+.DS_Store
+.idea/

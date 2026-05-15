@@ -1,0 +1,17 @@
+{
+  "orgs_before_any_filter": 41706,
+  "programme_filter": "ALL",
+  "max_orgs": 2000,
+  "edges_org_project_before": 178558,
+  "edges_org_org_before": 1145155,
+  "gaps_before_filter": 1674,
+  "ranked_by": "pagerank_collab",
+  "fallback_used": false,
+  "orgs_after_programme_filter": 41706,
+  "orgs_after_top_n_filter": 2000,
+  "edges_org_project_after": 99044,
+  "edges_org_org_after": 244799,
+  "gaps_after_relaxed_filter": 685,
+  "context_only_orgs_added": 110,
+  "original_org_count": 41706
+}
