@@ -35,6 +35,9 @@ rapport/premium/*.synctex.gz
 rapport/premium/*.bbl
 rapport/premium/*.blg
 
+# LaTeX (racine projet)
+texput.log
+
 # OS / IDE
 .DS_Store
 .idea/
