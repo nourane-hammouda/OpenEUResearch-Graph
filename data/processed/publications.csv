@@ -1,0 +1,201 @@
+publication_id,doi,year,title,journal
+https://openalex.org/W2179438025,https://doi.org/10.1186/s13059-014-0550-8,2014,Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2,Genome biology
+https://openalex.org/W2799524357,https://doi.org/10.1093/molbev/msy096,2018,MEGA X: Molecular Evolutionary Genetics Analysis across Computing Platforms,Molecular Biology and Evolution
+https://openalex.org/W2134967712,https://doi.org/10.1002/jcc.21334,2009,"AutoDock Vina: Improving the speed and accuracy of docking with a new scoring function, efficient optimization, and multithreading",Journal of Computational Chemistry
+https://openalex.org/W2051978340,https://doi.org/10.1038/gim.2015.30,2015,Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology,Genetics in Medicine
+https://openalex.org/W2102619694,https://doi.org/10.1093/bioinformatics/btq033,2010,BEDTools: a flexible suite of utilities for comparing genomic features,Bioinformatics
+https://openalex.org/W2970684805,https://doi.org/10.1136/bmj.l4898,2019,RoB 2: a revised tool for assessing risk of bias in randomised trials,BMJ
+https://openalex.org/W2280404143,https://doi.org/10.1001/jama.2016.0287,2016,The Third International Consensus Definitions for Sepsis and Septic Shock (Sepsis-3),JAMA
+https://openalex.org/W2180229411,https://doi.org/10.1107/s0907444909052925,2010,<i>PHENIX</i>: a comprehensive Python-based system for macromolecular structure solution,Acta Crystallographica Section D Biological Crystallography
+https://openalex.org/W4392145873,https://doi.org/10.3929/ethz-b-000667478,2024,"Two new Later Stone Age sites from the Final Pleistocene in the Falémé Valley, eastern Senegal",ENLIGHTEN (Jurnal Bimbingan dan Konseling Islam)
+https://openalex.org/W1999574084,https://doi.org/10.1186/1471-2105-12-323,2011,RSEM: accurate transcript quantification from RNA-Seq data with or without a reference genome,BMC Bioinformatics
+https://openalex.org/W2963276645,https://doi.org/10.1038/s41587-019-0209-9,2019,"Reproducible, interactive, scalable and extensible microbiome data science using QIIME 2",Nature Biotechnology
+https://openalex.org/W2124985265,https://doi.org/10.1186/gb-2009-10-3-r25,2009,Ultrafast and memory-efficient alignment of short DNA sequences to the human genome,Genome biology
+https://openalex.org/W2056279562,https://doi.org/10.1371/journal.pone.0061217,2013,phyloseq: An R Package for Reproducible Interactive Analysis and Graphics of Microbiome Census Data,PLoS ONE
+https://openalex.org/W2163341755,https://doi.org/10.1107/s0021889807021206,2007,<i>Phaser</i>crystallographic software,Journal of Applied Crystallography
+https://openalex.org/W2122825543,https://doi.org/10.1111/j.1467-9868.2005.00503.x,2005,Regularization and Variable Selection Via the Elastic Net,Journal of the Royal Statistical Society Series B (Statistical Methodology)
+https://openalex.org/W2104549677,https://doi.org/10.1038/nature15393,2015,A global reference for human genetic variation,Nature
+https://openalex.org/W2900569176,https://doi.org/10.1093/nar/gky1131,2018,"STRING v11: protein–protein association networks with increased coverage, supporting functional discovery in genome-wide experimental datasets",Nucleic Acids Research
+https://openalex.org/W3092849554,https://doi.org/10.1016/s0140-6736(20)30925-9,2020,"Global burden of 369 diseases and injuries in 204 countries and territories, 1990–2019: a systematic analysis for the Global Burden of Disease Study 2019",The Lancet
+https://openalex.org/W2531269403,https://doi.org/10.1136/bmj.i4919,2016,ROBINS-I: a tool for assessing risk of bias in non-randomised studies of interventions,BMJ
+https://openalex.org/W1997183854,https://doi.org/10.1016/j.cell.2012.03.042,2012,Ferroptosis: An Iron-Dependent Form of Nonapoptotic Cell Death,Cell
+https://openalex.org/W2149992227,https://doi.org/10.1093/bioinformatics/btr330,2011,The variant call format and VCFtools,Bioinformatics
+https://openalex.org/W2965373594,https://doi.org/10.4230/lipics.cp.2025.31,2019,"HISTORIAE, History of Socio-Cultural Transformation as Linguistic Data Science. A Humanities Use Case",DROPS (Schloss Dagstuhl – Leibniz Center for Informatics)
+https://openalex.org/W1997476591,https://doi.org/10.1111/j.1558-5646.1984.tb05657.x,1984,ESTIMATING<i>F</i>-STATISTICS FOR THE ANALYSIS OF POPULATION STRUCTURE,Evolution
+https://openalex.org/W2949177718,https://doi.org/10.1016/j.cell.2019.05.031,2019,Comprehensive Integration of Single-Cell Data,Cell
+https://openalex.org/W2133856765,https://doi.org/10.1186/gb-2011-12-6-r60,2011,Metagenomic biomarker discovery and explanation,Genome biology
+https://openalex.org/W2580767461,https://doi.org/10.1038/s41598-016-0028-x,2017,Ror2 signaling regulates Golgi structure and transport through IFT20 for tumor invasiveness,Scientific Reports
+https://openalex.org/W2928665623,https://doi.org/10.1038/s41467-019-09234-6,2019,Metascape provides a biologist-oriented resource for the analysis of systems-level datasets,Nature Communications
+https://openalex.org/W2133465414,https://doi.org/10.1093/nar/gkn923,2008,Bioinformatics enrichment tools: paths toward the comprehensive functional analysis of large gene lists,Nucleic Acids Research
+https://openalex.org/W2125065061,https://doi.org/10.1016/s0140-6736(12)61728-0,2012,Global and regional mortality from 235 causes of death for 20 age groups in 1990 and 2010: a systematic analysis for the Global Burden of Disease Study 2010,The Lancet
+https://openalex.org/W2912654919,https://doi.org/10.1016/s0140-6736(18)32279-7,2018,"Global, regional, and national incidence, prevalence, and years lived with disability for 354 diseases and injuries for 195 countries and territories, 1990–2017: a systematic analysis for the Global Burden of Disease Study 2017",The Lancet
+https://openalex.org/W2140729960,https://doi.org/10.1186/gb-2013-14-4-r36,2013,"TopHat2: accurate alignment of transcriptomes in the presence of insertions, deletions and gene fusions",Genome biology
+https://openalex.org/W2099085143,https://doi.org/10.1186/s13742-015-0047-8,2015,Second-generation PLINK: rising to the challenge of larger and richer datasets,GigaScience
+https://openalex.org/W2751884637,https://doi.org/10.1016/s0140-6736(17)32154-2,2017,"Global, regional, and national incidence, prevalence, and years lived with disability for 328 diseases and injuries for 195 countries, 1990–2016: a systematic analysis for the Global Burden of Disease Study 2016",The Lancet
+https://openalex.org/W3144543375,https://doi.org/10.1186/s13643-021-01626-4,2021,The PRISMA 2020 statement: an updated guideline for reporting systematic reviews,Systematic Reviews
+https://openalex.org/W2096283457,https://doi.org/10.1038/nature11412,2012,Comprehensive molecular portraits of human breast tumours,Nature
+https://openalex.org/W2110052313,https://doi.org/10.1016/s0140-6736(12)61766-8,2012,"A comparative risk assessment of burden of disease and injury attributable to 67 risk factors and risk factor clusters in 21 regions, 1990–2010: a systematic analysis for the Global Burden of Disease Study 2010",The Lancet
+https://openalex.org/W2128769815,https://doi.org/10.1038/nature11234,2012,"Structure, function and diversity of the healthy human microbiome",Nature
+https://openalex.org/W2345356016,https://doi.org/10.1093/nar/gkw377,2016,Enrichr: a comprehensive gene set enrichment analysis web server 2016 update,Nucleic Acids Research
+https://openalex.org/W3146142859,https://doi.org/10.1016/j.ijsu.2021.105906,2021,The PRISMA 2020 statement: An updated guideline for reporting systematic reviews,International Journal of Surgery
+https://openalex.org/W2801159594,https://doi.org/10.1093/sysbio/syy032,2018,Posterior Summarization in Bayesian Phylogenetics Using Tracer 1.7,Systematic Biology
+https://openalex.org/W3113178943,https://doi.org/10.1016/j.jacc.2020.11.010,2020,"Global Burden of Cardiovascular Diseases and Risk Factors, 1990–2019",Journal of the American College of Cardiology
+https://openalex.org/W2154589460,https://doi.org/10.1172/jci39104,2009,The basics of epithelial-mesenchymal transition,Journal of Clinical Investigation
+https://openalex.org/W2131222241,https://doi.org/10.1038/nature12060,2013,The global distribution and burden of dengue,Nature
+https://openalex.org/W1982855075,https://doi.org/10.1371/journal.pone.0112963,2014,Pilon: An Integrated Tool for Comprehensive Microbial Variant Detection and Genome Assembly Improvement,PLoS ONE
+https://openalex.org/W2984472267,https://doi.org/10.1038/s41592-019-0619-0,2019,"Fast, sensitive and accurate integration of single-cell data with Harmony",Nature Methods
+https://openalex.org/W3029661147,https://doi.org/10.1038/s41586-020-2308-7,2020,"The mutational constraint spectrum quantified from variation in 141,456 humans",Nature
+https://openalex.org/W3083406432,https://doi.org/10.1002/pro.3943,2020,"<scp>UCSF ChimeraX</scp>: Structure visualization for researchers, educators, and developers",Protein Science
+https://openalex.org/W4281790889,https://doi.org/10.1038/s41592-022-01488-1,2022,ColabFold: making protein folding accessible to all,Nature Methods
+https://openalex.org/W3092861045,https://doi.org/10.1016/s0140-6736(20)30752-2,2020,"Global burden of 87 risk factors in 204 countries and territories, 1990–2019: a systematic analysis for the Global Burden of Disease Study 2019",The Lancet
+https://openalex.org/W2132262459,https://doi.org/10.1002/jcc.21287,2009,CHARMM: The biomolecular simulation program,Journal of Computational Chemistry
+https://openalex.org/W2109491705,https://doi.org/10.1038/ni.1863,2010,The role of pattern-recognition receptors in innate immunity: update on Toll-like receptors,Nature Immunology
+https://openalex.org/W2107665951,https://doi.org/10.1093/biostatistics/kxj037,2006,Adjusting batch effects in microarray expression data using empirical Bayes methods,Biostatistics
+https://openalex.org/W2008869160,https://doi.org/10.1172/jci19246,2003,Obesity is associated with macrophage accumulation in adipose tissue,Journal of Clinical Investigation
+https://openalex.org/W2899736836,https://doi.org/10.1016/s0140-6736(18)32203-7,2018,"Global, regional, and national age-sex-specific mortality for 282 causes of death in 195 countries and territories, 1980–2017: a systematic analysis for the Global Burden of Disease Study 2017",The Lancet
+https://openalex.org/W2026616100,https://doi.org/10.1016/j.mri.2012.05.001,2012,3D Slicer as an image computing platform for the Quantitative Imaging Network,Magnetic Resonance Imaging
+https://openalex.org/W2262414037,https://doi.org/10.1038/nature11252,2012,Comprehensive molecular characterization of human colon and rectal cancer,Nature
+https://openalex.org/W2042433863,https://doi.org/10.1016/j.cell.2010.01.022,2010,Pattern Recognition Receptors and Inflammation,Cell
+https://openalex.org/W2170024099,https://doi.org/10.1128/aem.71.12.8228-8235.2005,2005,UniFrac: a New Phylogenetic Method for Comparing Microbial Communities,Applied and Environmental Microbiology
+https://openalex.org/W3136918052,https://doi.org/10.1093/nar/gky1049,2018,UniProt: a worldwide hub of protein knowledge,Nucleic Acids Research
+https://openalex.org/W4249727000,https://doi.org/10.1172/jci200319246,2003,Obesity is associated with macrophage accumulation in adipose tissue,Journal of Clinical Investigation
+https://openalex.org/W2070050178,https://doi.org/10.1186/1471-2105-14-128,2013,Enrichr: interactive and collaborative HTML5 gene list enrichment analysis tool,BMC Bioinformatics
+https://openalex.org/W2096791516,https://doi.org/10.1038/nature11632,2012,"An integrated map of genetic variation from 1,092 human genomes",Nature
+https://openalex.org/W2096528587,https://doi.org/10.1016/s0140-6736(12)61031-9,2012,Effect of physical inactivity on major non-communicable diseases worldwide: an analysis of burden of disease and life expectancy,The Lancet
+https://openalex.org/W2127435093,https://doi.org/10.1038/nature06536,2008,Global trends in emerging infectious diseases,Nature
+https://openalex.org/W2999615587,https://doi.org/10.1038/s42256-019-0138-9,2020,From local explanations to global understanding with explainable AI for trees,Nature Machine Intelligence
+https://openalex.org/W2123696077,https://doi.org/10.1038/nature10166,2011,Integrated genomic analyses of ovarian carcinoma,Nature
+https://openalex.org/W2171777347,https://doi.org/10.1038/nature09534,2010,A map of human genome variation from population-scale sequencing,Nature
+https://openalex.org/W2044433401,https://doi.org/10.1126/science.1235122,2013,Cancer Genome Landscapes,Science
+https://openalex.org/W2396881363,https://doi.org/10.1038/sdata.2016.35,2016,"MIMIC-III, a freely accessible critical care database",Scientific Data
+https://openalex.org/W2735527928,https://doi.org/10.1038/sigtrans.2017.23,2017,NF-κB signaling in inflammation,Signal Transduction and Targeted Therapy
+https://openalex.org/W2149573313,https://doi.org/10.1038/nature07540,2008,A core gut microbiome in obese and lean twins,Nature
+https://openalex.org/W3132661792,https://doi.org/10.1038/s41467-021-21246-9,2021,Inference and analysis of cell-cell communication using CellChat,Nature Communications
+https://openalex.org/W2025183726,https://doi.org/10.1038/nature07385,2008,Comprehensive genomic characterization defines human glioblastoma genes and core pathways,Nature
+https://openalex.org/W3027630905,https://doi.org/10.1056/nejmoa2007764,2020,Remdesivir for the Treatment of Covid-19 — Final Report,New England Journal of Medicine
+https://openalex.org/W2134629862,https://doi.org/10.7554/elife.05005,2015,Predicting effective microRNA target sites in mammalian mRNAs,eLife
+https://openalex.org/W2069089843,https://doi.org/10.1038/nbt.3192,2015,Spatial reconstruction of single-cell gene expression data,Nature Biotechnology
+https://openalex.org/W2168630917,https://doi.org/10.1016/s0140-6736(14)61682-2,2014,"Global, regional, and national age–sex specific all-cause and cause-specific mortality for 240 causes of death, 1990–2013: a systematic analysis for the Global Burden of Disease Study 2013",The Lancet
+https://openalex.org/W2116658855,https://doi.org/10.1523/jneurosci.5587-06.2007,2007,Dissociable Intrinsic Connectivity Networks for Salience Processing and Executive Control,Journal of Neuroscience
+https://openalex.org/W2114622716,https://doi.org/10.1107/97809553602060000865,2012,<i>PHENIX</i>: a comprehensive Python-based system for macromolecular structure solution,International Tables for Crystallography
+https://openalex.org/W2899760200,https://doi.org/10.1093/nar/gky1106,2018,The PRIDE database and related tools and resources in 2019: improving support for quantification data,Nucleic Acids Research
+https://openalex.org/W2998853022,https://doi.org/10.1016/s0140-6736(19)32989-7,2020,"Global, regional, and national sepsis incidence and mortality, 1990–2017: analysis for the Global Burden of Disease Study",The Lancet
+https://openalex.org/W2593816418,https://doi.org/10.1016/j.cell.2017.02.004,2017,"mTOR Signaling in Growth, Metabolism, and Disease",Cell
+https://openalex.org/W2998840182,https://doi.org/10.1038/s41467-019-13993-7,2020,U1 snRNP regulates cancer cell migration and invasion in vitro,Nature Communications
+https://openalex.org/W2151464048,https://doi.org/10.1038/nature01262,2002,Initial sequencing and comparative analysis of the mouse genome,Nature
+https://openalex.org/W3197233575,https://doi.org/10.1016/s1474-4422(21)00252-0,2021,"Global, regional, and national burden of stroke and its risk factors, 1990–2019: a systematic analysis for the Global Burden of Disease Study 2019",The Lancet Neurology
+https://openalex.org/W2973457155,https://doi.org/10.1107/s2059798319011471,2019,"Macromolecular structure determination using X-rays, neutrons and electrons: recent developments in <i>Phenix</i>",Acta Crystallographica Section D Structural Biology
+https://openalex.org/W2577537660,https://doi.org/10.18637/jss.v076.i01,2017,<i>Stan</i>: A Probabilistic Programming Language,Journal of Statistical Software
+https://openalex.org/W2762087180,https://doi.org/10.1016/j.cell.2017.09.021,2017,"Ferroptosis: A Regulated Cell Death Nexus Linking Metabolism, Redox Biology, and Disease",Cell
+https://openalex.org/W2076154138,https://doi.org/10.1038/nature14248,2015,Integrative analysis of 111 reference human epigenomes,Nature
+https://openalex.org/W3109746568,https://doi.org/10.1038/s41573-020-0090-8,2020,Engineering precision nanoparticles for drug delivery,Nature Reviews Drug Discovery
+https://openalex.org/W3112376646,https://doi.org/10.1093/nar/gkaa1100,2020,UniProt: the universal protein knowledgebase in 2021,Nucleic Acids Research
+https://openalex.org/W2026062398,https://doi.org/10.1371/journal.pcbi.1003537,2014,BEAST 2: A Software Platform for Bayesian Evolutionary Analysis,PLoS Computational Biology
+https://openalex.org/W2228338508,https://doi.org/10.1007/978-3-7643-8340-4_6,2012,Heavy Metal Toxicity and the Environment,Proceedings of the Fourth International Symposium on Polarization Phenomena in Nuclear Reactions
+https://openalex.org/W2101675075,https://doi.org/10.1002/mrm.21391,2007,Sparse MRI: The application of compressed sensing for rapid MR imaging,Magnetic Resonance in Medicine
+https://openalex.org/W2143238378,https://doi.org/10.1093/nar/gkg509,2003,SIFT: predicting amino acid changes that affect protein function,Nucleic Acids Research
+https://openalex.org/W2990618091,https://doi.org/10.1186/s13059-019-1891-0,2019,Improved metagenomic analysis with Kraken 2,Genome biology
+https://openalex.org/W2614986146,https://doi.org/10.1016/s0140-6736(16)31012-1,2016,"Global, regional, and national life expectancy, all-cause mortality, and cause-specific mortality for 249 causes of death, 1980–2015: a systematic analysis for the Global Burden of Disease Study 2015",The Lancet
+https://openalex.org/W4309506674,https://doi.org/10.1093/nar/gkac1052,2022,UniProt: the Universal Protein Knowledgebase in 2023,Nucleic Acids Research
+https://openalex.org/W3208691473,https://doi.org/10.1093/nar/gkab1038,2021,The PRIDE database resources in 2022: a hub for mass spectrometry-based proteomics evidences,Nucleic Acids Research
+https://openalex.org/W2107503723,https://doi.org/10.1091/mbc.e02-02-0105,2002,Human Adipose Tissue Is a Source of Multipotent Stem Cells,Molecular Biology of the Cell
+https://openalex.org/W2039123767,https://doi.org/10.1038/nature13954,2014,PD-1 blockade induces responses by inhibiting adaptive immune resistance,Nature
+https://openalex.org/W2169353806,https://doi.org/10.1093/bioinformatics/bts034,2012,The <tt>sva</tt> package for removing batch effects and other unwanted variation in high-throughput experiments,Bioinformatics
+https://openalex.org/W2160995259,https://doi.org/10.1038/ng.2892,2014,A general framework for estimating the relative pathogenicity of human genetic variants,Nature Genetics
+https://openalex.org/W2098082628,https://doi.org/10.1016/s0140-6736(15)60692-4,2015,"Global, regional, and national incidence, prevalence, and years lived with disability for 301 acute and chronic diseases and injuries in 188 countries, 1990–2013: a systematic analysis for the Global Burden of Disease Study 2013",The Lancet
+https://openalex.org/W2078119356,https://doi.org/10.1093/nar/12.18.7035,1984,Efficient<i>in vitro</i>synthesis of biologically active RNA and RNA hybridization probes from plasmids containing a bacteriophage SP6 promoter,Nucleic Acids Research
+https://openalex.org/W2126547130,https://doi.org/10.1038/nature13480,2014,Comprehensive molecular characterization of gastric adenocarcinoma,Nature
+https://openalex.org/W1994823455,https://doi.org/10.1038/nature06639,2008,Autophagy fights disease through cellular self-digestion,Nature
+https://openalex.org/W3005957464,https://doi.org/10.1016/s0140-6736(20)30045-3,2020,"Global, regional, and national burden of chronic kidney disease, 1990–2017: a systematic analysis for the Global Burden of Disease Study 2017",The Lancet
+https://openalex.org/W2005895632,https://doi.org/10.1038/nature10983,2012,"The genomic and transcriptomic architecture of 2,000 breast tumours reveals novel subgroups",Nature
+https://openalex.org/W2122386753,https://doi.org/10.1152/physrev.00029.2006,2007,Nitric Oxide and Peroxynitrite in Health and Disease,Physiological Reviews
+https://openalex.org/W2058401000,https://doi.org/10.1038/nature02168,2003,The International HapMap Project,Nature
+https://openalex.org/W2115462905,https://doi.org/10.1093/bioinformatics/btq170,2010,ConsensusClusterPlus: a class discovery tool with confidence assessments and item tracking,Bioinformatics
+https://openalex.org/W2153860431,https://doi.org/10.1038/ng.3211,2015,LD Score regression distinguishes confounding from polygenicity in genome-wide association studies,Nature Genetics
+https://openalex.org/W2024729467,https://doi.org/10.1016/j.neuroimage.2013.05.041,2013,The WU-Minn Human Connectome Project: An overview,NeuroImage
+https://openalex.org/W3168436232,https://doi.org/10.1021/acs.jcim.1c00203,2021,"AutoDock Vina 1.2.0: New Docking Methods, Expanded Force Field, and Python Bindings",Journal of Chemical Information and Modeling
+https://openalex.org/W1989277387,https://doi.org/10.1093/nar/gkv1351,2015,The Reactome pathway Knowledgebase,Nucleic Acids Research
+https://openalex.org/W2752326209,https://doi.org/10.1080/15548627.2015.1100356,2016,Guidelines for the use and interpretation of assays for monitoring autophagy (3rd edition),Autophagy
+https://openalex.org/W2329336071,https://doi.org/10.15252/emmm.201606210,2016,The amyloid hypothesis of Alzheimer's disease at 25 years,EMBO Molecular Medicine
+https://openalex.org/W2104234755,https://doi.org/10.1016/j.jsb.2012.09.006,2012,RELION: Implementation of a Bayesian approach to cryo-EM structure determination,Journal of Structural Biology
+https://openalex.org/W4220831425,https://doi.org/10.1093/nar/gkac194,2022,DAVID: a web server for functional enrichment analysis and functional annotation of gene lists (2021 update),Nucleic Acids Research
+https://openalex.org/W2217809488,https://doi.org/10.1038/nature04226,2005,A haplotype map of the human genome,Nature
+https://openalex.org/W2807194798,https://doi.org/10.1186/s40168-018-0470-z,2018,Optimizing taxonomic classification of marker-gene amplicon sequences with QIIME 2’s q2-feature-classifier plugin,Microbiome
+https://openalex.org/W2903899730,https://doi.org/10.1038/s41579-018-0118-9,2018,Origin and evolution of pathogenic coronaviruses,Nature Reviews Microbiology
+https://openalex.org/W2559537906,https://doi.org/10.1182/blood-2016-08-733196,2016,Diagnosis and management of AML in adults: 2017 ELN recommendations from an international expert panel,Blood
+https://openalex.org/W2180481128,https://doi.org/10.1038/nature13385,2014,Comprehensive molecular profiling of lung adenocarcinoma,Nature
+https://openalex.org/W2041440766,https://doi.org/10.1038/nature12113,2013,Integrated genomic characterization of endometrial carcinoma,Nature
+https://openalex.org/W2154197653,https://doi.org/10.1107/s0907444912001308,2012,Towards automated crystallographic structure refinement with <i>phenix.refine</i>,Acta Crystallographica Section D Biological Crystallography
+https://openalex.org/W1533942137,https://doi.org/10.1126/science.1262110,2015,The Genotype-Tissue Expression (GTEx) pilot analysis: Multitissue gene regulation in humans,Science
+https://openalex.org/W2754967293,https://doi.org/10.1016/s1474-4422(18)30499-x,2019,"Global, regional, and national burden of neurological disorders, 1990–2016: a systematic analysis for the Global Burden of Disease Study 2016",The Lancet Neurology
+https://openalex.org/W2120731293,https://doi.org/10.1073/pnas.0402680101,2004,Dynamic mapping of human cortical development during childhood through early adulthood,Proceedings of the National Academy of Sciences
+https://openalex.org/W2316376271,https://doi.org/10.1056/nejm199704033361401,1997,"Inflammation, Aspirin, and the Risk of Cardiovascular Disease in Apparently Healthy Men",New England Journal of Medicine
+https://openalex.org/W2141647078,https://doi.org/10.1093/jnci/90.18.1371,1998,Tamoxifen for Prevention of Breast Cancer: Report of the National Surgical Adjuvant Breast and Bowel Project P-1 Study,JNCI Journal of the National Cancer Institute
+https://openalex.org/W2554773181,https://doi.org/10.1038/nrc.2016.108,2016,"Cancer nanomedicine: progress, challenges and opportunities",Nature reviews. Cancer
+https://openalex.org/W3186179742,https://doi.org/10.1126/science.abj8754,2021,Accurate prediction of protein structures and interactions using a three-track neural network,Science
+https://openalex.org/W3133859624,https://doi.org/10.1126/science.aaz1776,2020,The GTEx Consortium atlas of genetic regulatory effects across human tissues,Science
+https://openalex.org/W2622807556,https://doi.org/10.1016/j.cell.2017.05.018,2017,A Unique Microglia Type Associated with Restricting Development of Alzheimer’s Disease,Cell
+https://openalex.org/W2107554012,https://doi.org/10.1186/gb-2006-7-10-r100,2006,CellProfiler: image analysis software for identifying and quantifying cell phenotypes,Genome biology
+https://openalex.org/W2134539328,https://doi.org/10.1172/jci45014,2011,Identification of human triple-negative breast cancer subtypes and preclinical models for selection of targeted therapies,Journal of Clinical Investigation
+https://openalex.org/W2763355946,https://doi.org/10.1038/nrclinonc.2017.141,2017,Radiomics: the bridge between medical imaging and personalized medicine,Nature Reviews Clinical Oncology
+https://openalex.org/W1987604182,https://doi.org/10.1016/j.ejphar.2014.07.025,2014,Cisplatin in cancer therapy: Molecular mechanisms of action,European Journal of Pharmacology
+https://openalex.org/W2054275187,https://doi.org/10.1523/jneurosci.1860-14.2014,2014,"An RNA-Sequencing Transcriptome and Splicing Database of Glia, Neurons, and Vascular Cells of the Cerebral Cortex",Journal of Neuroscience
+https://openalex.org/W2379365975,https://doi.org/10.1016/j.bbmt.2014.12.001,2014,National Institutes of Health Consensus Development Project on Criteria for Clinical Trials in Chronic Graft-versus-Host Disease: I. The 2014 Diagnosis and Staging Working Group Report,Biology of Blood and Marrow Transplantation
+https://openalex.org/W2154026962,https://doi.org/10.1038/ismej.2011.139,2011,An improved Greengenes taxonomy with explicit ranks for ecological and evolutionary analyses of bacteria and archaea,The ISME Journal
+https://openalex.org/W2739999456,https://doi.org/10.1093/nar/gku989,2014,UniProt: a hub for protein information,Nucleic Acids Research
+https://openalex.org/W4236476849,https://doi.org/10.31222/osf.io/v7gm2,2020,The PRISMA 2020 statement: an updated guideline for reporting systematic reviews,
+https://openalex.org/W2128030851,https://doi.org/10.1093/brain/awr179,2011,Sensitivity of revised diagnostic criteria for the behavioural variant of frontotemporal dementia,Brain
+https://openalex.org/W2066848874,https://doi.org/10.1038/npp.2009.110,2009,Neurocircuitry of Addiction,Neuropsychopharmacology
+https://openalex.org/W2898402099,https://doi.org/10.1093/nar/gky995,2018,The Pfam protein families database in 2019,Nucleic Acids Research
+https://openalex.org/W1934094702,https://doi.org/10.1038/nm.3967,2015,The consensus molecular subtypes of colorectal cancer,Nature Medicine
+https://openalex.org/W1255676896,https://doi.org/10.1056/nejmoa1301689,2013,Genomic and Epigenomic Landscapes of Adult De Novo Acute Myeloid Leukemia,New England Journal of Medicine
+https://openalex.org/W2950595506,https://doi.org/10.1093/nar/gky1055,2018,The Gene Ontology Resource: 20 years and still GOing strong,Nucleic Acids Research
+https://openalex.org/W2332292689,https://doi.org/10.1126/science.aad0501,2016,Dissecting the multicellular ecosystem of metastatic melanoma by single-cell RNA-seq,Science
+https://openalex.org/W2151734986,https://doi.org/10.3322/caac.20114,2011,Photodynamic therapy of cancer: An update,CA A Cancer Journal for Clinicians
+https://openalex.org/W2074661552,https://doi.org/10.1007/s00401-009-0619-8,2009,Astrocytes: biology and pathology,Acta Neuropathologica
+https://openalex.org/W2997022986,https://doi.org/10.1093/bioinformatics/btz931,2019,ShinyGO: a graphical gene-set enrichment tool for animals and plants,Bioinformatics
+https://openalex.org/W1981239255,https://doi.org/10.1038/nature12111,2013,The zebrafish reference genome sequence and its relationship to the human genome,Nature
+https://openalex.org/W2103004421,https://doi.org/10.1038/ncomms5006,2014,Decoding tumour phenotype by noninvasive imaging using a quantitative radiomics approach,Nature Communications
+https://openalex.org/W2138190873,https://doi.org/10.1212/wnl.0b013e31821103e6,2011,Classification of primary progressive aphasia and its variants,Neurology
+https://openalex.org/W2148898943,https://doi.org/10.1126/science.1194637,2010,Fate Mapping Analysis Reveals That Adult Microglia Derive from Primitive Macrophages,Science
+https://openalex.org/W2301131921,https://doi.org/10.1159/000444256,2016,Modulating Innate and Adaptive Immunity by (R)-Roscovitine: Potential Therapeutic Opportunity in Cystic Fibrosis,Journal of Innate Immunity
+https://openalex.org/W2223535266,https://doi.org/10.1016/j.tibs.2015.12.001,2016,The Warburg Effect: How Does it Benefit Cancer Cells?,Trends in Biochemical Sciences
+https://openalex.org/W1950118853,https://doi.org/10.1038/nature15756,2015,Tumour exosome integrins determine organotropic metastasis,Nature
+https://openalex.org/W2017821362,https://doi.org/10.1103/physreve.49.1685,1994,Mosaic organization of DNA nucleotides,"Physical review. E, Statistical physics, plasmas, fluids, and related interdisciplinary topics"
+https://openalex.org/W2899773405,https://doi.org/10.1016/s0140-6736(18)32225-6,2018,"Global, regional, and national comparative risk assessment of 84 behavioural, environmental and occupational, and metabolic risks or clusters of risks for 195 countries and territories, 1990–2017: a systematic analysis for the Global Burden of Disease Study 2017",The Lancet
+https://openalex.org/W2118858814,https://doi.org/10.1007/s00134-007-0934-2,2007,Surviving Sepsis Campaign: International guidelines for management of severe sepsis and septic shock: 2008,Intensive Care Medicine
+https://openalex.org/W3136955306,https://doi.org/10.1038/s41591-021-01283-z,2021,Post-acute COVID-19 syndrome,Nature Medicine
+https://openalex.org/W2166734004,https://doi.org/10.1086/588660,2008,Revised Definitions of Invasive Fungal Disease from the European Organization for Research and Treatment of Cancer/Invasive Fungal Infections Cooperative Group and the National Institute of Allergy and Infectious Diseases Mycoses Study Group (EORTC/MSG) Consensus Group,Clinical Infectious Diseases
+https://openalex.org/W2131478115,https://doi.org/10.1371/journal.pcbi.1003118,2013,Software for Computing and Annotating Genomic Ranges,PLoS Computational Biology
+https://openalex.org/W3022285953,https://doi.org/10.1038/s41586-020-2286-9,2020,A SARS-CoV-2 protein interaction map reveals targets for drug repurposing,Nature
+https://openalex.org/W2266175888,https://doi.org/10.1038/nature16521,2016,Fully integrated wearable sensor arrays for multiplexed in situ perspiration analysis,Nature
+https://openalex.org/W2143625465,https://doi.org/10.1038/nature11582,2012,Host–microbe interactions have shaped the genetic architecture of inflammatory bowel disease,Nature
+https://openalex.org/W2765322245,https://doi.org/10.1002/pro.3330,2017,MolProbity: More and better reference data for improved all‐atom structure validation,Protein Science
+https://openalex.org/W2159954944,https://doi.org/10.1186/gb-2014-15-3-r46,2014,Kraken: ultrafast metagenomic sequence classification using exact alignments,Genome biology
+https://openalex.org/W2997280954,https://doi.org/10.1186/s13059-019-1874-1,2019,Normalization and variance stabilization of single-cell RNA-seq data using regularized negative binomial regression,Genome biology
+https://openalex.org/W2130010412,https://doi.org/10.1016/j.neuroimage.2007.04.042,2007,A component based noise correction method (CompCor) for BOLD and perfusion based fMRI,NeuroImage
+https://openalex.org/W2592509339,https://doi.org/10.1111/epi.13709,2017,<scp>ILAE</scp> classification of the epilepsies: Position paper of the <scp>ILAE</scp> Commission for Classification and Terminology,Epilepsia
+https://openalex.org/W2101870168,https://doi.org/10.1093/bioinformatics/btu049,2014,Minfi: a flexible and comprehensive Bioconductor package for the analysis of Infinium DNA methylation microarrays,Bioinformatics
+https://openalex.org/W2344644350,https://doi.org/10.1038/natrevmats.2016.14,2016,Analysis of nanoparticle delivery to tumours,Nature Reviews Materials
+https://openalex.org/W2059099579,https://doi.org/10.1038/nature08514,2009,Human DNA methylomes at base resolution show widespread epigenomic differences,Nature
+https://openalex.org/W2147101007,https://doi.org/10.1523/jneurosci.18-24-10464.1998,1998,"Synaptic Modifications in Cultured Hippocampal Neurons: Dependence on Spike Timing, Synaptic Strength, and Postsynaptic Cell Type",Journal of Neuroscience
+https://openalex.org/W3119952098,https://doi.org/10.1038/s41573-020-00114-z,2021,Natural products in drug discovery: advances and opportunities,Nature Reviews Drug Discovery
+https://openalex.org/W3004348779,https://doi.org/10.1128/jvi.00127-20,2020,Receptor Recognition by the Novel Coronavirus from Wuhan: an Analysis Based on Decade-Long Structural Studies of SARS Coronavirus,Journal of Virology
+https://openalex.org/W2533800772,https://doi.org/10.1146/annurev-bioeng-071516-044442,2017,Deep Learning in Medical Image Analysis,Annual Review of Biomedical Engineering
+https://openalex.org/W2055348159,https://doi.org/10.1038/nature12034,2013,"Macrophage biology in development, homeostasis and disease",Nature
+https://openalex.org/W2100592123,https://doi.org/10.1038/nprot.2007.30,2007,In vitro scratch assay: a convenient and inexpensive method for analysis of cell migration in vitro,Nature Protocols
+https://openalex.org/W2115779804,https://doi.org/10.1038/ng.2802,2013,"Meta-analysis of 74,046 individuals identifies 11 new susceptibility loci for Alzheimer's disease",Nature Genetics
+https://openalex.org/W2761275051,https://doi.org/10.1038/nature24277,2017,Genetic effects on gene expression across human tissues,Nature
+https://openalex.org/W2952001873,https://doi.org/10.1186/s13059-017-1349-1,2017,xCell: digitally portraying the tissue cellular heterogeneity landscape,Genome biology
+https://openalex.org/W2901954177,https://doi.org/10.1371/journal.pcbi.1006650,2019,BEAST 2.5: An advanced software platform for Bayesian evolutionary analysis,PLoS Computational Biology
+https://openalex.org/W2119279196,https://doi.org/10.1038/nature06258,2007,A second generation human haplotype map of over 3.1 million SNPs,Nature
+https://openalex.org/W2901303766,https://doi.org/10.1093/nar/gky1120,2018,"The NHGRI-EBI GWAS Catalog of published genome-wide association studies, targeted arrays and summary statistics 2019",Nucleic Acids Research
+https://openalex.org/W2117834225,https://doi.org/10.1093/aje/kws342,2013,Increased Prevalence of Sleep-Disordered Breathing in Adults,American Journal of Epidemiology
+https://openalex.org/W2145697808,https://doi.org/10.1172/jci29881,2007,Obesity induces a phenotypic switch in adipose tissue macrophage polarization,Journal of Clinical Investigation
+https://openalex.org/W2083927153,https://doi.org/10.1007/s10278-013-9622-7,2013,The Cancer Imaging Archive (TCIA): Maintaining and Operating a Public Information Repository,Journal of Digital Imaging
+https://openalex.org/W2993908729,https://doi.org/10.1038/s41591-019-0675-0,2019,Chronic inflammation in the etiology of disease across the life span,Nature Medicine
+https://openalex.org/W3039901154,https://doi.org/10.1016/j.cell.2020.06.043,2020,Tracking Changes in SARS-CoV-2 Spike: Evidence that D614G Increases Infectivity of the COVID-19 Virus,Cell
+https://openalex.org/W2048030072,https://doi.org/10.1159/000346388,2013,Autophagy and Viruses: Adversaries or Allies?,Journal of Innate Immunity
+https://openalex.org/W2504691963,https://doi.org/10.1038/nbt.3597,2016,Sharing and community curation of mass spectrometry data with Global Natural Products Social Molecular Networking,Nature Biotechnology
+https://openalex.org/W2165700542,https://doi.org/10.1210/er.2009-0002,2009,Endocrine-Disrupting Chemicals: An Endocrine Society Scientific Statement,Endocrine Reviews
+https://openalex.org/W4211196614,https://doi.org/10.1002/cpbi.3,2016,Comparative Protein Structure Modeling Using MODELLER,Current Protocols in Bioinformatics

@@ -13,15 +13,27 @@ build/
 .env
 .env.*
 
-# Données lourdes / reproductibles avec le pipeline
-data/raw/
-data/processed/
+# --- data/ : cœur du projet (voir data/README.md) ---
+# Bruts : régénérables par fetch (volumétrie ~350 Mo) — structure seule sur Git
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/cordis/
+data/raw/cordis/*
+!data/raw/cordis/.gitkeep
+!data/raw/openalex/
+data/raw/openalex/*
+!data/raw/openalex/.gitkeep
 
-# Millions de fichiers HTML (fiches organisations)
+# Tables normalisées + livrables graphs légers : VERSIONNÉS
+# (ne pas ré-ignorer data/processed/ ni la plupart de data/graphs/)
+
+# Exclusions ciblées (taille / nombre de fichiers)
 data/graphs/org_profiles/
-
-# GEXF de collaboration très volumineux (> limite GitHub recommandée)
-data/graphs/*.gexf
+data/graphs/fr_es_profiles/
+data/graphs/collab_explicit.gexf
+data/graphs/multiplex_full.graphml
+data/graphs/gap_analysis.gexf
+data/graphs/map_concept_networkx.gexf
 
 # LaTeX (garder source + PDF ; pas les artefacts)
 rapport/premium/*.aux
